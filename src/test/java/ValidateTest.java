@@ -22,7 +22,6 @@ public class ValidateTest {
     @Test
     public void parseGA() throws IOException {
         ObjectMapper om = new ObjectMapper();
-        om.readValue(getFileContent("active_debt.json"), gaAnswer.class);
         om.readValue(getFileContent("money_statistic.json"), gaAnswer.class);
         om.readValue(getFileContent("statistic.json"), gaAnswer.class);
         om.readValue(getFileContent("users.json"), gaAnswer.class);

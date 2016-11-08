@@ -7,4 +7,11 @@ public class User {
     String name ;
     String vkID ;
     String city ;
+    Integer paymentNum ;
+    Integer paymentSum ;
+    Integer debtCount ;
+    Integer currentDeb ;
+    Integer earlyReturn ;
+    Integer delayReturn ;
+    Boolean hasLastMounthsPays ;
 }
