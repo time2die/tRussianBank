@@ -1,0 +1,23 @@
+group 'org.time2java'
+version '0.1-beta'
+
+apply plugin: 'java'
+apply plugin: 'scala'
+apply plugin: 'application'
+apply plugin: 'idea'
+
+
+mainClassName='Main'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile "org.projectlombok:lombok:1.16.10"
+    compile("org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE")
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
