@@ -53,8 +53,12 @@ public class ValidateTest {
         List<User> users = ConvertTools.convertAnswerToUsers(usersAnswer) ;
         Assert.assertTrue(users.size() == 3);
         Assert.assertTrue(users.contains(getUser1()));
+        Assert.assertTrue(users.contains(getUser2()));
+        Assert.assertTrue(users.contains(getUser3()));
     }
 
+
+    //todo заполнить все поля из файла
     private User getUser1() {
         return User
                 .builder()
@@ -62,6 +66,17 @@ public class ValidateTest {
                 .city("Новосибирск")
                 .build();
     }
+
+    //todo заполнить
+    private User getUser2() {
+        return null;
+    }
+
+    //todo заполнить
+    private User getUser3() {
+        return null;
+    }
+
 
     public static String getFileContent(String fileName) {
         try {
