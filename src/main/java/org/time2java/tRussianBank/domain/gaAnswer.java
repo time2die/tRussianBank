@@ -1,4 +1,4 @@
-package org.time2java.tRussianBanr.domain;
+package org.time2java.tRussianBank.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

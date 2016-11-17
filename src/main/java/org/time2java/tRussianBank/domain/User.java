@@ -1,8 +1,17 @@
-package org.time2java.tRussianBanr.domain;
+package org.time2java.tRussianBank.domain;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by time2die on 08.11.16.
  */
+@Data
+@NoArgsConstructor
+@Builder
+@EqualsAndHashCode
 public class User {
     String name ;
     String vkID ;
