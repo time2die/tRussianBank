@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
  * Created by time2die on 08.11.16.
  */
 @Data
-@NoArgsConstructor
 @Builder
 @EqualsAndHashCode
 public class Status {
-    Integer bankCapital ;
-    Integer debt ;
-    Integer active ;
-    Integer bankAge ;
-    Integer memberNum ;
-    Integer city ;
+    Integer bankCapital;
+    Integer debt;
+    Integer active;
+    Integer bankAge;
+    Integer memberNum;
+    Integer city;
 }

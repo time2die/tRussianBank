@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.time2java.tRussianBank.utils.ConvertTools;
 import org.time2java.tRussianBank.domain.User;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by time2die on 06.11.16.
  */
-
+@Ignore
 public class ValidateTest {
 
     @Test

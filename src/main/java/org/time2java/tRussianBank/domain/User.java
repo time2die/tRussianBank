@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
  * Created by time2die on 08.11.16.
  */
 @Data
-@NoArgsConstructor
 @Builder
 @EqualsAndHashCode
 public class User {
