@@ -1,17 +1,21 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.time2java.tRussianBanr.domain.gaAnswer;
+import org.time2java.tRussianBank.utils.ConvertTools;
+import org.time2java.tRussianBank.domain.User;
+import org.time2java.tRussianBank.domain.gaAnswer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Created by time2die on 06.11.16.
  */
-
+@Ignore
 public class ValidateTest {
 
     @Test
@@ -32,6 +36,48 @@ public class ValidateTest {
     public void canReadResources() throws URISyntaxException, IOException {
         Assert.assertNotNull(getFileContent("users.json"));
     }
+
+
+    static private  gaAnswer getUsersAnswer(){
+        ObjectMapper om = new ObjectMapper();
+        try {
+            return om.readValue(getFileContent("users.json"), gaAnswer.class);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        return null ;
+    }
+
+    @Test
+    public void canParseUser(){
+        gaAnswer usersAnswer = getUsersAnswer() ;
+        List<User> users = ConvertTools.convertAnswerToUsers(usersAnswer) ;
+        Assert.assertTrue(users.size() == 3);
+        Assert.assertTrue(users.contains(getUser1()));
+        Assert.assertTrue(users.contains(getUser2()));
+        Assert.assertTrue(users.contains(getUser3()));
+    }
+
+
+    //todo заполнить все поля из файла
+    private User getUser1() {
+        return User
+                .builder()
+                .name("Кухарев Даниил")
+                .city("Новосибирск")
+                .build();
+    }
+
+    //todo заполнить
+    private User getUser2() {
+        return null;
+    }
+
+    //todo заполнить
+    private User getUser3() {
+        return null;
+    }
+
 
     public static String getFileContent(String fileName) {
         try {
