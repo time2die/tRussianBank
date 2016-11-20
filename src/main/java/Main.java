@@ -31,7 +31,7 @@ public class Main {
             if (update.hasMessage() && update.getMessage().hasText() && "/status".equals(update.getMessage().getText())) {
                 SendMessage message = new SendMessage()
                         .setChatId(update.getMessage().getChatId())
-                        .setText("very much $$$$$");
+                        .setText(GoogleApiClient.getStatus().substring(0,100));
                 try {
                     sendMessage(message);
                 } catch (TelegramApiException e) {
