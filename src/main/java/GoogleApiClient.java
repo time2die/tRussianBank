@@ -59,6 +59,13 @@ public class GoogleApiClient {
             result.append("\n");
         }
 
+        int indexR = result.indexOf("\u20BD") ;
+        while ((indexR != -1)){
+            result.setCharAt(indexR,'р');
+            indexR = result.indexOf("\u20BD") ;
+        }
+        result.setCharAt(0,'1');
+
         return  result.toString() ;
     }
 }
