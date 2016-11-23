@@ -19,6 +19,7 @@ repositories {
 
 
 dependencies {
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
     compile group: 'org.telegram', name: 'telegrambots', version: '2.4.3'
     compile "org.projectlombok:lombok:1.16.10"
     compile("org.springframework.boot:spring-boot-starter-web:1.4.1.RELEASE")
