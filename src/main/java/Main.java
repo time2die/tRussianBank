@@ -7,6 +7,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 @SpringBootApplication
 
 public class Main {
-    private static final Logger logger = Logger.getLogger("Telegram Bots Api");
+    private static final Logger logger = Logger.getLogger("tRussianBot");
 
     public static void main(String[] args) throws TelegramApiRequestException {
         TelegramBotsApi tg = new TelegramBotsApi();
@@ -27,15 +28,19 @@ public class Main {
     public static class MyAmazingBot extends TelegramLongPollingBot {
         @Override
         public void onUpdateReceived(Update update) {
+            logger.log(Level.ALL, update.getMessage().getChatId().toString());
+            logger.log(Level.ALL, update.getMessage().getText());
+            if (update.hasMessage() && update.getMessage().hasText() && "/status".equals(update.getMessage().getText().trim().toLowerCase())) {
+                if (update.getMessage().getChatId() == 69711013 || update.getMessage().getChatId() == -29036710) {
 
-            if (update.hasMessage() && update.getMessage().hasText() && "/status".equals(update.getMessage().getText())) {
-                SendMessage message = new SendMessage()
-                        .setChatId(update.getMessage().getChatId())
-                        .setText(GoogleApiClient.getStatus().substring(0,100));
-                try {
-                    sendMessage(message);
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
+                    SendMessage message = new SendMessage()
+                            .setChatId(update.getMessage().getChatId())
+                            .setText(GoogleApiClient.getStatus());
+                    try {
+                        sendMessage(message);
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -47,7 +52,7 @@ public class Main {
 
         @Override
         public String getBotToken() {
-            return "";
+            return "297674569:AAEJMu7_CxS3-Z3CkAcc1v4lH54iWNcn7FY";
         }
     }
 }
