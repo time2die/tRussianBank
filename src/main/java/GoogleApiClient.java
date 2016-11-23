@@ -1,4 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -17,8 +19,10 @@ import java.util.List;
 public class GoogleApiClient {
     public static final String getStatus(){
 
-        String docId = "";
-        String key = "" ;
+        Config conf = ConfigFactory.load();
+
+        String docId = conf.getString("docId");
+        String key = conf.getString("key") ;
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/A5%3AB7?key="+key;
 
         HttpClient client = HttpClientBuilder.create().build();
