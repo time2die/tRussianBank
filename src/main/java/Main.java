@@ -26,7 +26,7 @@ public class Main {
     }
 
     private String  initConfiguration() {
-        Config conf = ConfigFactory.load("prod.conf");
+        Config conf = ConfigFactory.load();
         return conf.getString("tgBotKey");
     }
 
@@ -52,7 +52,7 @@ public class Main {
             if (update.hasMessage() && update.getMessage().hasText() && "/status".equals(update.getMessage().getText())) {
                 SendMessage message = new SendMessage()
                         .setChatId(update.getMessage().getChatId())
-                        .setText(GoogleApiClient.getStatus().substring(0,100));
+                        .setText(GoogleApiClient.getStatus());
                 try {
                     sendMessage(message);
                 } catch (TelegramApiException e) {

@@ -4,3 +4,6 @@
 /.gradle/
 .gitignore
 .travis.yml
+/src/main/resources/application.conf
+src/main/scala/
+src/test/scala/
