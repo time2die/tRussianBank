@@ -1,3 +1,4 @@
+import com.typesafe.config.Config;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -6,6 +7,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import com.typesafe.config.ConfigFactory;
 
 import java.util.logging.Logger;
 
@@ -15,16 +17,35 @@ import java.util.logging.Logger;
 @SpringBootApplication
 
 public class Main {
-    private static final Logger logger = Logger.getLogger("Telegram Bots Api");
+    private static final Logger logger = Logger.getLogger("tRussianBank");
 
-    public static void main(String[] args) throws TelegramApiRequestException {
-        TelegramBotsApi tg = new TelegramBotsApi();
-        ApiContextInitializer.init();
-
-        tg.registerBot(new MyAmazingBot());
+    private final String tgKey ;
+    Main(){
+        tgKey =  initConfiguration() ;
+        initTgListener() ;
     }
 
-    public static class MyAmazingBot extends TelegramLongPollingBot {
+    private String  initConfiguration() {
+        Config conf = ConfigFactory.load("prod.conf");
+        return conf.getString("tgBotKey");
+    }
+
+    private void initTgListener() {
+        try {
+            TelegramBotsApi tg = new TelegramBotsApi();
+            ApiContextInitializer.init();
+            tg.registerBot(new MyAmazingBot());
+        } catch (TelegramApiRequestException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
+    public static void main(String[] args) throws TelegramApiRequestException {
+        new Main() ;
+    }
+
+    public class MyAmazingBot extends TelegramLongPollingBot {
         @Override
         public void onUpdateReceived(Update update) {
 
@@ -47,7 +68,7 @@ public class Main {
 
         @Override
         public String getBotToken() {
-            return "";
+            return tgKey;
         }
     }
 }
