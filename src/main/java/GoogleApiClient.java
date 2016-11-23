@@ -23,8 +23,6 @@ public class GoogleApiClient {
 
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
-//        docId = "1YorNLviZ-0hMqtqKKeVbZ9NDHYoq7NiI4pZJWBqi-s0" ;
-//        key = "" ;
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/A5%3AB7?key="+key;
 
         HttpClient client = HttpClientBuilder.create().build();
