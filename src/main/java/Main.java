@@ -52,7 +52,7 @@ public class Main {
 
         @Override
         public String getBotToken() {
-            return "297674569:AAEJMu7_CxS3-Z3CkAcc1v4lH54iWNcn7FY";
+            return "";
         }
     }
 }
