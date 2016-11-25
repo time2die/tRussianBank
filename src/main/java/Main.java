@@ -30,7 +30,7 @@ public class Main {
         public void onUpdateReceived(Update update) {
             logger.log(Level.ALL, update.getMessage().getChatId().toString());
             logger.log(Level.ALL, update.getMessage().getText());
-            if (update.hasMessage() && update.getMessage().hasText() && "/status".equals(update.getMessage().getText().trim().toLowerCase())) {
+            if (updateHasCommand(update,"/status")) {
                 if (update.getMessage().getChatId() == 69711013 || update.getMessage().getChatId() == -29036710) {
 
                     SendMessage message = new SendMessage()
@@ -43,6 +43,10 @@ public class Main {
                     }
                 }
             }
+        }
+
+        public boolean updateHasCommand(Update update, String message){
+            return  update.hasMessage() && update.getMessage().hasText() && message.equals(update.getMessage().getText().trim().toLowerCase()) ;
         }
 
         @Override
