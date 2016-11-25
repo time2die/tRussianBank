@@ -71,7 +71,7 @@ public class GoogleApiClient {
         return  result.toString() ;
     }
 
-    static String getAllUser(){
+    static gaAnswer getAllUser(){
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AJ50?key="+key ;
@@ -105,6 +105,6 @@ public class GoogleApiClient {
             ga = om.readValue(result.toString() , gaAnswer.class);
         } catch (IOException e) { e.printStackTrace(); }
 
-        return  result.toString() ;
+        return  ga ;
     }
 }
