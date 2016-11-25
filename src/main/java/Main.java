@@ -1,3 +1,5 @@
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -19,6 +21,8 @@ public class Main {
     }
 
     public static class tRussianBankBot extends TelegramLongPollingBot {
+        Config conf = ConfigFactory.load();
+
         @Override
         public void onUpdateReceived(Update update) {
             if (updateHasCommand(update, "/status")) {
@@ -42,7 +46,7 @@ public class Main {
                 sendMessage(update, "Следует указать кого вы ищите.\nПример работы: /search урбанист");
             }
 
-            sendMessage(update, text);
+            sendMessage(update, GoogleApiClient.getAllUser().substring(0,50));
         }
 
         void processElseVariant(Update update) {
@@ -81,7 +85,7 @@ public class Main {
 
         @Override
         public String getBotToken() {
-            return "231872682:AAH_QI3VbUAqaDfAs4jO4fYIjbdJCsAdsuY";
+            return conf.getString("tgBotKey");
         }
     }
 }
