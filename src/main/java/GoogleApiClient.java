@@ -17,10 +17,9 @@ import java.util.List;
  * Created by time2die on 20.11.16.
  */
 public class GoogleApiClient {
+
+    static Config conf = ConfigFactory.load();
     public static final String getStatus(){
-
-        Config conf = ConfigFactory.load();
-
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/A5%3AB7?key="+key;
@@ -70,5 +69,42 @@ public class GoogleApiClient {
         }
 
         return  result.toString() ;
+    }
+
+    static gaAnswer getAllUser(){
+        String docId = conf.getString("docId");
+        String key = conf.getString("key") ;
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AJ50?key="+key ;
+
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet(url);
+
+        HttpResponse response = null;
+        try {
+            response = client.execute(request);
+        } catch (IOException e) { e.printStackTrace();}
+
+        System.out.println("-------------------------------------------: "+url);
+
+        BufferedReader rd = null;
+        try {
+            rd = new BufferedReader( new InputStreamReader(response.getEntity().getContent()));
+        } catch (IOException e) { e.printStackTrace(); }
+
+        StringBuffer result = new StringBuffer();
+        String line = "";
+        try {
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+        } catch (IOException e) { e.printStackTrace(); }
+
+        ObjectMapper om = new ObjectMapper();
+        gaAnswer ga = null ;
+        try {
+            ga = om.readValue(result.toString() , gaAnswer.class);
+        } catch (IOException e) { e.printStackTrace(); }
+
+        return  ga ;
     }
 }

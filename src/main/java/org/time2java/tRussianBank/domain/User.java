@@ -16,9 +16,9 @@ public class User {
     String vkID ;
     String city ;
     Integer paymentNum ;
-    Integer paymentSum ;
+    Double paymentSum ;
     Integer debtCount ;
-    Integer currentDeb ;
+    Double currentDeb ;
     Integer earlyReturn ;
     Integer delayReturn ;
     Boolean hasLastMounthsPays ;
