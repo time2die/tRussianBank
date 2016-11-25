@@ -68,7 +68,6 @@ public class GoogleApiClient {
             result.setCharAt(indexR,'р');
             indexR = result.indexOf("\u20BD") ;
         }
-        result.setCharAt(0,'1');
 
         return  result.toString() ;
     }
