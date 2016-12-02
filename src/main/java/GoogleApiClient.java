@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -74,7 +75,7 @@ public class GoogleApiClient {
     static gaAnswer getAllUser(){
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
-        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AJ50?key="+key ;
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AL50?key="+key ;
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(url);
@@ -98,11 +99,14 @@ public class GoogleApiClient {
                 result.append(line);
             }
         } catch (IOException e) { e.printStackTrace(); }
+        String resultString = StringUtils.replace(result.toString(),"ё","е") ;
+
+        System.out.println("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrre:\n"+resultString);
 
         ObjectMapper om = new ObjectMapper();
         gaAnswer ga = null ;
         try {
-            ga = om.readValue(result.toString() , gaAnswer.class);
+            ga = om.readValue(resultString , gaAnswer.class);
         } catch (IOException e) { e.printStackTrace(); }
 
         return  ga ;

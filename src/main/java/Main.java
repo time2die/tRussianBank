@@ -1,5 +1,7 @@
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -7,7 +9,6 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
-import org.time2java.tRussianBank.domain.User;
 import org.time2java.tRussianBank.domain.gaAnswer;
 
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import java.util.Set;
  * Created by time2die on 06.11.16.
  */
 
+@Slf4j
 public class Main {
 
     public static void main(String[] args) throws TelegramApiRequestException {
@@ -47,13 +49,14 @@ public class Main {
         void processSearchOperation(Update update){
             String text = null;
             try {
-                text = update.getMessage().getText().split(" ")[1];
+                text = update.getMessage().getText().split(" ")[1].toLowerCase();
+                text = StringUtils.replace(text,"ё","е") ;
             } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
                 sendMessage(update, "Следует указать кого вы ищите.\nПример работы: /search урбанист");
             }
 
             gaAnswer ga = GoogleApiClient.getAllUser() ;
-            Set<List<String>> searchResult = search(ga,text.toLowerCase()) ;
+            Set<List<String>> searchResult = search(ga,text) ;
 
             if(searchResult.size() == 0){
                 sendMessage(update,"Совпадений нет");
@@ -64,6 +67,7 @@ public class Main {
             }
 
             List<String> resultUser = searchResult.iterator().next() ;
+            log.error("resultUser: "+resultUser.toString());
 
             String v0 = resultUser.get(0) ;
             String v1 = resultUser.get(1) ;
@@ -75,20 +79,10 @@ public class Main {
             String v7 = resultUser.get(7) ;
             String v8 = resultUser.get(8) ;
             String v9 = resultUser.get(9) ;
+            String v10 = resultUser.get(10) ;
+            String v11 = resultUser.get(11) ;
 
 
-//            User user = User
-//                    .builder()
-//                    .name(v0)
-//                    .vkID(v1)
-//                    .city(v2)
-//                    .paymentNum(v3 == null ? 0 : Integer.valueOf(v3))
-//                    .paymentSum(v4 == null ? 0 : Double.valueOf(v4))
-//                    .debtCount(v5 == null ? 0 : Integer.valueOf(v5))
-//                    .currentDeb(v6 == null ? 0 : Double.valueOf(v6))
-//                    .earlyReturn(v7 == null ? 0 : Integer.valueOf(v7))
-//                    .hasLastMounthsPays(v8 == null ? false : Boolean.FALSE.valueOf(v8))
-//                    .build();
 
             StringBuffer sb = new StringBuffer() ;
             try {
@@ -97,9 +91,12 @@ public class Main {
                 sb.append("\nНа сумму: "+v4);
                 sb.append("\nВсего займов: "+v5);
                 sb.append("\nСейчас должен: "+v6);
-                sb.append("\nДосрочных погашений: "+ ("".equals(v7)? "нет" :v7));
-                sb.append("\nПросрочек: "+("".equals(v8)? "нет" :v8));
-//                sb.append("\nВзносов за 3 месяца : "+v9);
+                if(!"".equals(v7))
+                sb.append("\nДата возврата: "+v7);
+                sb.append("\nДосрочных погашений: "+ ("".equals(v8)? "нет" :v8));
+                sb.append("\nПросрочек: "+("".equals(v9)? "нет" :v9));
+                sb.append("\nВзносы за последние 3 месяц: "+("".equals(v10)? "нет" :v10));
+                sb.append("\nВзносы за текущий месяц: "+("".equals(v11)? "нет" :v11));
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -107,6 +104,7 @@ public class Main {
 
             sendMessage(update,sb.toString());
         }
+
 
         private Set<List<String>> search(gaAnswer ga, String text) {
             Set<List<String>> result = new HashSet<>() ;
