@@ -82,27 +82,31 @@ public class Main {
             String v10 = resultUser.get(10) ;
             String v11 = resultUser.get(11) ;
 
-
-
             StringBuffer sb = new StringBuffer() ;
             try {
                 sb.append(v0) ;
                 sb.append("\nВсего взносов: "+v3);
                 sb.append("\nНа сумму: "+v4);
                 sb.append("\nВсего займов: "+v5);
-                sb.append("\nСейчас должен: "+v6);
-                if(!"".equals(v7))
-                sb.append("\nДата возврата: "+v7);
+                if(!"".equals(v7)) {
+                    sb.append("\nСейчас должен: " + v6);
+                    sb.append("\nДата возврата: " + v7);
+                }
                 sb.append("\nДосрочных погашений: "+ ("".equals(v8)? "нет" :v8));
                 sb.append("\nПросрочек: "+("".equals(v9)? "нет" :v9));
-                sb.append("\nВзносы за последние 3 месяц: "+("".equals(v10)? "нет" :v10));
-                sb.append("\nВзносы за текущий месяц: "+("".equals(v11)? "нет" :v11));
+                sb.append("\nВзносы за последние 3 месяц: "+getBooleanValueFromGAPI(v10));
+                sb.append("\nВзносы за текущий месяц: "+getBooleanValueFromGAPI(v11));
             }catch (Exception e){
                 e.printStackTrace();
             }
 
-
             sendMessage(update,sb.toString());
+        }
+
+        private String getBooleanValueFromGAPI(String value){
+            if("0".equals(value) || "".equals(value))
+                return "уплачено" ;
+            return "не уплачено";
         }
 
 
