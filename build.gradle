@@ -7,7 +7,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 
 
-mainClassName = 'Main'
+mainClassName = 'org.time2java.tRussianBank.Main'
 sourceCompatibility = 1.8
 
 repositories {
