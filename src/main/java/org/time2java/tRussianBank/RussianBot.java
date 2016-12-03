@@ -23,7 +23,7 @@ public class RussianBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (updateHasCommand(update, "/status")) {
+        if (updateStartWithCommand(update, "/status")) {
             if (userHasRights(update)) {
                 sendMessage(update, GoogleApiClient.getStatus());
             }
@@ -31,7 +31,7 @@ public class RussianBot extends TelegramLongPollingBot {
             sendMessage(update, "Довольно странно спрашивать информация про урбаниста кода Вы в компании приличных русских людей");
         } else if (updateStartWithCommand(update, "/search") && userHasRights(update)) {
             processSearchOperation(update);
-        } else if (updateHasCommand(update, "/debts") && userHasRights(update)) {
+        } else if (updateStartWithCommand(update, "/debts") && userHasRights(update)) {
             processDebtsCommand(update);
         } else {
 //                processElseVariant(update);
