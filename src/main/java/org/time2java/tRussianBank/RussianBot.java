@@ -33,9 +33,26 @@ public class RussianBot extends TelegramLongPollingBot {
             processSearchOperation(update);
         } else if (updateStartWithCommand(update, "/debts") && userHasRights(update)) {
             processDebtsCommand(update);
+        } else if (updateStartWithCommand(update, "/cards") && userHasRights(update)) {
+            processCardsCommand(update);
         } else {
 //                processElseVariant(update);
         }
+    }
+
+    private void processCardsCommand(Update update) {
+        gaAnswer ga = GoogleApiClient.getCardsInfo();
+        String  number = ga.getValues().get(0).get(0) ;
+        String summ = ga.getValues().get(0).get(1) ;
+        String fullName = ga.getValues().get(1).get(0) ;
+        String result = "" ;
+        result += "держатель: "+ fullName ;
+        result +="\n" ;
+        result += "номер карты: "+number ;
+        result +="\n" ;
+        result += "сумма на карте: "+summ ;
+
+        sendMessage(update, result);
     }
 
     private void processDebtsCommand(Update update) {
