@@ -28,7 +28,7 @@ public class RussianBot extends TelegramLongPollingBot {
                 sendMessage(update, GoogleApiClient.getStatus());
             }
         } else if (updateHasCommand(update, "/search урбанист") && userHasRights(update)) {
-            sendMessage(update, "Довольно странно спрашивать информация про урбаниста кода Вы в компании приличных русских людей");
+            sendMessage(update, "Ой, всё");
         } else if (updateStartWithCommand(update, "/search") && userHasRights(update)) {
             processSearchOperation(update);
         } else if (updateStartWithCommand(update, "/debts") && userHasRights(update)) {
@@ -42,15 +42,15 @@ public class RussianBot extends TelegramLongPollingBot {
 
     private void processCardsCommand(Update update) {
         gaAnswer ga = GoogleApiClient.getCardsInfo();
-        String  number = ga.getValues().get(0).get(0) ;
-        String summ = ga.getValues().get(0).get(1) ;
-        String city = ga.getValues().get(1).get(0) ;
-        String result = "" ;
-        result += "номер карты: "+number ;
-        result +="\n" ;
-        result += "сумма на карте: "+summ ;
-        result +="\n" ;
-        result += "город: "+ "Санкт-Петербург" ;
+        String number = ga.getValues().get(0).get(0);
+        String summ = ga.getValues().get(0).get(1);
+        String city = ga.getValues().get(1).get(0);
+        String result = "";
+        result += "номер карты: " + number;
+        result += "\n";
+        result += "сумма на карте: " + summ;
+        result += "\n";
+        result += "город: " + "Санкт-Петербург";
 
         sendMessage(update, result);
     }
