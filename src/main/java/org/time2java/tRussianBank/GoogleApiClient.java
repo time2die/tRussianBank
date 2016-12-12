@@ -58,7 +58,7 @@ public class GoogleApiClient {
     static gaAnswer getCardsInfo(){
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
-        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%94%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D0%B5%D0%BB%D0%B8!A4%3AB5?key="+key ;
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%94%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D0%B5%D0%BB%D0%B8!A4%3AB23?key="+key ;
 
         return  getAnswerFromGA(url) ;
 

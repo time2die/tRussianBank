@@ -44,13 +44,28 @@ public class RussianBot extends TelegramLongPollingBot {
         gaAnswer ga = GoogleApiClient.getCardsInfo();
         String number = ga.getValues().get(0).get(0);
         String summ = ga.getValues().get(0).get(1);
-        String city = ga.getValues().get(1).get(0);
+        String city = ga.getValues().get(2).get(0);
+
         String result = "";
         result += "номер карты: " + number;
         result += "\n";
         result += "сумма на карте: " + summ;
         result += "\n";
-        result += "город: " + "Санкт-Петербург";
+        result += "город: " + city;
+
+
+        number = ga.getValues().get(17).get(0);
+        summ = ga.getValues().get(17).get(1);
+        city = ga.getValues().get(19).get(0);
+
+        if (!"".equals(number)) {
+            result += "\n\nномер карты: " + number;
+            result += "\n";
+            result += "сумма на карте: " + summ;
+            result += "\n";
+            result += "город: " + city;
+        }
+
 
         sendMessage(update, result);
     }
