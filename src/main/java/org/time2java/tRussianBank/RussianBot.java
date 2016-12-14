@@ -35,6 +35,10 @@ public class RussianBot extends TelegramLongPollingBot {
             processDebtsCommand(update);
         } else if (updateStartWithCommand(update, "/cards") && userHasRights(update)) {
             processCardsCommand(update);
+        } else if (updateStartWithCommand(update, "/rules") && userHasRights(update)) {
+            sendMessage(update,"Правила работы кассы\n"+conf.getString("rules"));
+        } else if (updateStartWithCommand(update, "/fullstats") && userHasRights(update)) {
+            sendMessage(update,"Учет кассы\n"+conf.getString("fullstats"));
         } else {
 //                processElseVariant(update);
         }
