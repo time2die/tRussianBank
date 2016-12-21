@@ -77,18 +77,17 @@ public class RussianBot extends TelegramLongPollingBot {
     private void processDebtsCommand(Update update) {
         gaAnswer ga = GoogleApiClient.getAllUser();
         Set<List<String>> searchResult = searchDebts(ga);
-        StringBuffer sb = new StringBuffer("Должники: ");
+        StringBuffer sb = new StringBuffer("");
         for (List<String> resultUser : searchResult) {
             String v0 = resultUser.get(0);
             String v6 = resultUser.get(6);
             String v7 = resultUser.get(7);
 
-            sb.append("\n");
-            sb.append("\n");
+            v7 = v7.split("\\.")[0] + "." + v7.split("\\.")[1] ;
             sb.append(v0);
-            sb.append("\nДолжен " + v6);
-            sb.append(" р до " + v7);
-
+            sb.append(": "+v6);
+            sb.append("\tдо " + v7);
+            sb.append("\n");
         }
 
         sendMessage(update, sb.toString());
@@ -104,7 +103,6 @@ public class RussianBot extends TelegramLongPollingBot {
                 continue;
             }
         }
-
 
         return result;
     }
