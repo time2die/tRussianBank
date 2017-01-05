@@ -27,10 +27,10 @@ public class GoogleApiClient {
         String key = conf.getString("key") ;
         String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/A5%3AB7?key="+key;
 
-        gaAnswer ga = getAnswerFromGA(url) ;
+        sAnswer ga = getAnswerFromGA(url) ;
 
         StringBuilder result = new StringBuilder() ;
-        for (List<String> iter1 : ga.getValues()) {
+        for (List<String> iter1 : ga.values()) {
             for (String iter2 : iter1) {
                 result.append(iter2) ;
                 result.append(" ");
@@ -47,24 +47,23 @@ public class GoogleApiClient {
         return  result.toString() ;
     }
 
-    static gaAnswer getAllUser(){
+    static sAnswer getAllUser(){
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
-        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AL50?key="+key ;
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8!A2%3AM50?key="+key ;
 
         return  getAnswerFromGA(url) ;
     }
 
-    static gaAnswer getCardsInfo(){
+    static sAnswer getCardsInfo(){
         String docId = conf.getString("docId");
         String key = conf.getString("key") ;
-        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%94%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D0%B5%D0%BB%D0%B8!A4%3AB23?key="+key ;
+        String url = "https://sheets.googleapis.com/v4/spreadsheets/"+docId+"/values/%D0%94%D0%B5%D1%80%D0%B6%D0%B0%D1%82%D0%B5%D0%BB%D0%B8!A2%3AB23?key="+key ;
 
         return  getAnswerFromGA(url) ;
-
     }
 
-    private static gaAnswer getAnswerFromGA(String uri){
+    private static sAnswer getAnswerFromGA(String uri){
         HttpClient client = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet(uri);
 
@@ -93,6 +92,6 @@ public class GoogleApiClient {
             ga = om.readValue(resultString , gaAnswer.class);
         } catch (IOException e) { e.printStackTrace(); }
 
-        return  ga ;
+        return  new sAnswer(ga.getValues()) ;
     }
 }
