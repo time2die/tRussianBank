@@ -15,11 +15,13 @@ import scala.collection.JavaConversions._
   */
 
 object Main {
-  def main(args: Array[String]) : Unit = {
+  def main(args: Array[String]): Unit = {
     ApiContextInitializer.init()
     new TelegramBotsApi().registerBot(new RussianBot)
   }
 }
+
+case class sAnswer(val values: java.util.List[java.util.List[String]])
 
 case class Account(name: String,
                    tgId: String,
@@ -33,7 +35,34 @@ case class Account(name: String,
                    earlyReturn: Integer,
                    delayReturn: Integer,
                    hasLastMounthsPays: Boolean,
-                   hasCurrentMounthsPays: Boolean)
+                   hasCurrentMounthsPays: Boolean) {
+  override def toString(): String = {
+    val sb: StringBuffer = new StringBuffer
+    try {
+      sb.append(this.name)
+      sb.append("\nВсего взносов: " + this.paymentNum)
+      sb.append("\nНа сумму: " + this.paymentSum)
+      sb.append("\nВсего займов: " + this.debtCount)
+      if ("" != this.returnDate) {
+        sb.append("\nСейчас должен: " + this.currentDeb)
+        sb.append("\nДата возврата: " + this.returnDate)
+      }
+      sb.append("\nДосрочных погашений: " + (if (0 == this.earlyReturn) "нет" else this.earlyReturn))
+      sb.append("\nПросрочек: " + (if (0 == this.delayReturn) "нет" else this.delayReturn))
+
+      def getBooleanValueFromGAPI(value: Boolean): String = if (value) "уплачено" else "не уплачено"
+
+      sb.append("\nВзносы за прошедшие 3 месяца: " + getBooleanValueFromGAPI(this.hasLastMounthsPays))
+      sb.append("\nВзносы за текущий месяц: " + getBooleanValueFromGAPI(this.hasLastMounthsPays))
+    }
+    catch {
+      case e: Exception => {
+        e.printStackTrace()
+      }
+    }
+    sb.toString
+  }
+}
 
 
 class RussianBot extends TelegramLongPollingBot {
@@ -47,8 +76,17 @@ class RussianBot extends TelegramLongPollingBot {
     else if (updateStartWithCommand(update, "/cards") && userHasRights(update)) processCardsCommand(update)
     else if (updateStartWithCommand(update, "/rules") && userHasRights(update)) sendMessage(update, "Правила работы кассы\n" + conf.getString("rules"))
     else if (updateStartWithCommand(update, "/fullstats") && userHasRights(update)) sendMessage(update, "Учет кассы\n" + conf.getString("fullstats"))
+    else if (updateStartWithCommand(update, "/aboutme")) processAboutMe(update)
     else if (updateStartWithCommand(update, "/myid")) processIdMessage(update, this)
     else {
+    }
+  }
+
+  def processAboutMe(update: Update): Unit = {
+    val user = convertGAtoAcconut(GoogleApiClient.getAllUser).filter(_.tgId == update.getMessage.getFrom.getId.toString)
+    user match {
+      case user :: nil => sendMessage(update, user.toString())
+      case _ => sendMessage(update, "Информации об этом пользователи пока нету в базе")
     }
   }
 
@@ -77,54 +115,33 @@ class RussianBot extends TelegramLongPollingBot {
   }
 
   def processSearchOperation(update: Update) {
-    var text: String = null
-    try {
-      text = update.getMessage.getText.split(" ")(1).toLowerCase
-      text = text.replace('ё', 'е')
+    val text: String = try {
+      update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
     }
     catch {
-      case ex: ArrayIndexOutOfBoundsException => sendMessage(update, "Следует указать кого вы ищите.\nПример работы: /search урбанист")
+      case ex: ArrayIndexOutOfBoundsException => {
+        return sendMessage(update, "Следует указать кого вы ищите.\nПример работы: /search урбанист")
+      }
     }
 
     val searchResult: List[Account] = search(GoogleApiClient.getAllUser, text)
 
-    if (searchResult.size == 0) {
-      sendMessage(update, "Совпадений нет")
-      return
-    }
-    else if (searchResult.size > 1) {
-      sendMessage(update, "Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
-      return
+    def needProcessPositiveCase(): Boolean = {
+      if (searchResult.size == 0) {
+        sendMessage(update, "Совпадений нет")
+        false
+      }
+      else if (searchResult.size > 1) {
+        sendMessage(update, "Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
+        false
+      }
+      true
     }
 
-    val resultUser = searchResult.head
-
-    val sb: StringBuffer = new StringBuffer
-    try {
-      sb.append(resultUser.name)
-      sb.append("\nВсего взносов: " + resultUser.paymentNum)
-      sb.append("\nНа сумму: " + resultUser.paymentSum)
-      sb.append("\nВсего займов: " + resultUser.debtCount)
-      if ("" != resultUser.returnDate) {
-        sb.append("\nСейчас должен: " + resultUser.currentDeb)
-        sb.append("\nДата возврата: " + resultUser.returnDate)
-      }
-      sb.append("\nДосрочных погашений: " + (if (0 == resultUser.earlyReturn) "нет" else resultUser.earlyReturn))
-      sb.append("\nПросрочек: " + (if (0 == resultUser.delayReturn) "нет" else resultUser.delayReturn))
-      sb.append("\nВзносы за прошедшие 3 месяца: " + getBooleanValueFromGAPI(resultUser.hasLastMounthsPays))
-      sb.append("\nВзносы за текущий месяц: " + getBooleanValueFromGAPI(resultUser.hasLastMounthsPays))
-    }
-    catch {
-      case e: Exception => {
-        e.printStackTrace()
-      }
-    }
-    sendMessage(update, sb.toString)
+    if (needProcessPositiveCase())
+      sendMessage(update, searchResult.head.toString)
   }
 
-  private def getBooleanValueFromGAPI(value: Boolean): String = {
-    if (value)  "уплачено" else "не уплачено"
-  }
 
   private def search(ga: sAnswer, text: String): List[Account] = {
     convertGAtoAcconut(ga).filter(_.name.toLowerCase().indexOf(text) != -1)
@@ -155,7 +172,7 @@ class RussianBot extends TelegramLongPollingBot {
     val sName = message.getFrom.getLastName
     val result = s"chatId:${chatId} from:${fName} ${sName} fromId:${fromId}"
 
-    if(chatId == fromId) sendMessage(update, result, bot)
+    if (chatId == fromId) sendMessage(update, result, bot)
 
     //log
     val log = new SendMessage()
