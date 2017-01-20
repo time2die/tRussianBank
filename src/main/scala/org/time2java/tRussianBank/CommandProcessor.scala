@@ -3,8 +3,6 @@ package org.time2java.tRussianBank
 import com.typesafe.config.Config
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
-import org.telegram.telegrambots.exceptions.TelegramApiException
 
 /**
   * Created by time2die on 07.01.17.
@@ -12,7 +10,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException
 class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
   if (!(userHasRights || update.getMessage.getChatId == -29036710))
     sendMessage("У вас нет прав")
-  else if (updateStartWithCommand(update, "/status")) sendMessage(GoogleApiClient.getStatus())
+  else if (updateStartWithCommand(update, "/status")) sendMessage(GoogleApiClient.getStatus)
   else if (updateStartWithCommand(update, "/search")) processSearchOperation(update)
   else if (updateStartWithCommand(update, "/debts")) processDebtsCommand(update)
   else if (updateStartWithCommand(update, "/cards")) processCardsCommand(update)
@@ -70,11 +68,11 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     def needProcessPositiveCase(): Boolean = {
       if (searchResult.size == 0) {
         sendMessage("Совпадений нет")
-        false
+        return false
       }
       else if (searchResult.size > 1) {
         sendMessage("Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
-        false
+        return false
       }
       true
     }
@@ -91,7 +89,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     else sendMessage("У вас не достаточно прав для выполнения запроса")
   }
 
-
   def processIdMessage(update: Update): Unit = {
     val message = update.getMessage
     val fromId = message.getFrom.getId
@@ -100,7 +97,11 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
     val result = s"fromId:${fromId} from:${fName} ${sName}"
 
-    sendMessage("Информации об этом пользователи пока нету в базе, все необходмые данные были отправлены держателю. Подождите, пожалуйста, пока их обработают")
+    if(fromId == message.getChatId)
+      sendMessage("Информации об этом пользователи пока нет в базе, все необходмые данные были отправлены держателю. Подождите, пожалуйста, пока их обработают")
+    else
+      sendMessage("Мы вас запомнили. Попробуйте позже.")
+
     sendTextToAdmin("add new user: " + result)
   }
 
@@ -119,18 +120,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
       sb.append("\n")
     }
     sendMessage(sb.toString)
-  }
-
-  def sendMessage(update: Update, text: String, bot: TelegramLongPollingBot) {
-    val message: SendMessage = new SendMessage().setChatId(update.getMessage.getChatId).setText(text)
-    try {
-      bot.sendMessage(message)
-    }
-    catch {
-      case e: TelegramApiException => {
-        e.printStackTrace()
-      }
-    }
   }
 
   def sendMessage(text: String) = this.bot.sendMessage(this.update, text)

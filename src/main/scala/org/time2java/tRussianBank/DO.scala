@@ -45,3 +45,9 @@ case class Account(name: String,
 }
 
 case class sAnswer(val values: java.util.List[java.util.List[String]])
+
+case class gaAnswer (
+   range:String,
+   majorDimension:String,
+   values:java.util.List[java.util.List[String]])
+
