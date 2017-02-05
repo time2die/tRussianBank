@@ -6,3 +6,5 @@
 .travis.yml
 /src/main/resources/application.conf
 src/test/scala/
+/StoredCredential
+/client_secret.json
