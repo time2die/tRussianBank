@@ -45,9 +45,3 @@ case class Account(name: String,
 }
 
 case class Answer(val values: List[List[String]])
-
-case class gaAnswer (
-   range:String,
-   majorDimension:String,
-   values:java.util.List[java.util.List[String]])
-

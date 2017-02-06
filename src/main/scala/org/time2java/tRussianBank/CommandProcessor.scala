@@ -10,11 +10,12 @@ import org.telegram.telegrambots.api.objects.Update
 class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
   if (!(userHasRights || update.getMessage.getChatId == -29036710))
     sendMessage("У вас нет прав")
-  else if (updateStartWithCommand(update, "/status")) sendMessage(NGA.getStatus)
+  else if (updateStartWithCommand(update, "/status")) processStatusCommand(update)
 
   //  else if (updateStartWithCommand(update, "/search")) processSearchOperation(update)
   //  else if (updateStartWithCommand(update, "/debts")) processDebtsCommand(update)
-  //  else if (updateStartWithCommand(update, "/cards")) processCardsCommand(update)
+  else if (updateStartWithCommand(update, "/cards")) processCardsCommand(update)
+
   //  else if (updateStartWithCommand(update, "/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   //  else if (updateStartWithCommand(update, "/aboutme")) processAboutMe(update)
   //  else {
@@ -28,29 +29,52 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
   //    }
   //  }
   //
-  //  def processCardsCommand(update: Update) {
-  //    val ga: sAnswer = GoogleApiClient.getCardsInfo
-  //    var number: String = ga.values.get(0).get(0)
-  //    var summ: String = ga.values.get(0).get(1)
-  //    var city: String = ga.values.get(2).get(0)
-  //    var result: String = ""
-  //    result += "номер карты: " + number
-  //    result += "\n"
-  //    result += "сумма на карте: " + summ
-  //    result += "\n"
-  //    result += "город: " + city
-  //    number = ga.values.get(17).get(0)
-  //    summ = ga.values.get(17).get(1)
-  //    city = ga.values.get(19).get(0)
-  //    if ("" != number) {
-  //      result += "\n\nномер карты: " + number
-  //      result += "\n"
-  //      result += "сумма на карте: " + summ
-  //      result += "\n"
-  //      result += "город: " + city
-  //    }
-  //    sendMessage(result)
-  //  }
+
+  def processStatusCommand(update: Update) {
+    val values = NGA.getStatus().values
+
+    val result: StringBuilder = new StringBuilder
+    for (iter1 <- values) {
+      for (iter2 <- iter1) {
+        result.append(iter2)
+        result.append(" ")
+      }
+      result.append("\n")
+    }
+
+    var indexR: Int = result.indexOf("\u20BD")
+    while (indexR != -1) {
+      result.setCharAt(indexR, 'р')
+      indexR = result.indexOf("\u20BD")
+    }
+
+    sendMessage(result.toString())
+  }
+
+  def processCardsCommand(update: Update) {
+    val ga: Answer = NGA.getCardHolder()
+    var number: String = ga.values(0)(0)
+    var summ: String = ga.values(0)(1)
+    var city: String = ga.values(2)(0)
+    var result: String = ""
+    result += "номер карты: " + number
+    result += "\n"
+    result += "сумма на карте: " + summ
+    result += "\n"
+    result += "город: " + city
+    number = ga.values(17)(0)
+    summ = ga.values(17)(1)
+    city = ga.values(19)(0)
+    if ("" != number) {
+      result += "\n\nномер карты: " + number
+      result += "\n"
+      result += "сумма на карте: " + summ
+      result += "\n"
+      result += "город: " + city
+    }
+    sendMessage(result)
+  }
+
   //
   //  def processSearchOperation(update: Update) {
   //    val text: String = try {
@@ -134,9 +158,7 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
   def filterByName(searchText: String): (Account => Boolean) = _.name.toLowerCase().replace('ё', 'е').indexOf(searchText) != -1
 
-  def userHasRights: Boolean = true
-
-  //    accounts.filter(filterByTGid).size == 1
+  def userHasRights: Boolean = true //    accounts.filter(filterByTGid).size == 1
 
   def updateStartWithCommand(update: Update, message: String): Boolean =
     update.hasMessage && update.getMessage.hasText && update.getMessage.getText.toLowerCase.startsWith(message)

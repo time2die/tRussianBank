@@ -24,7 +24,7 @@ object NGA {
   val DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR)
   val SCOPES: java.util.List[String] = Arrays.asList(SheetsScopes.SPREADSHEETS_READONLY)
 
-  def authorize: Credential = {
+  private def authorize: Credential = {
     val in: InputStream = new FileInputStream(new File("client_secret.json"))
     val clientSecrets: GoogleClientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in))
     val flow: GoogleAuthorizationCodeFlow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
@@ -36,34 +36,25 @@ object NGA {
     credential
   }
 
-  def getSheetsService: Sheets = {
+  private def getSheetsService: Sheets = {
     val credential: Credential = authorize
     new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build
   }
 
-  def getStatus(): String = {
+  private def getValues(range: String): Answer = {
     val service: Sheets = getSheetsService
-    val range: String = "A5:B7"
     val response: ValueRange = service.spreadsheets.values.get(conf.getString("docId"), range).execute
 
     import collection.JavaConverters._
-    val values = response.getValues.asScala.map(_.asScala.toList.map(_.toString)).toList
-
-    val result: StringBuilder = new StringBuilder
-    for (iter1 <- values) {
-      for (iter2 <- iter1) {
-        result.append(iter2)
-        result.append(" ")
-      }
-      result.append("\n")
-    }
-
-    var indexR: Int = result.indexOf("\u20BD")
-    while (indexR != -1) {
-      result.setCharAt(indexR, 'р')
-      indexR = result.indexOf("\u20BD")
-    }
-
-    result.toString
+    Answer(response.getValues.asScala.map(_.asScala.toList.map(_.toString)).toList)
   }
+
+  def getStatus(): Answer = {
+    getValues("A5:B7")
+  }
+
+  def getCardHolder(): Answer = {
+    getValues("Держатели!A2:B23")
+  }
+
 }
