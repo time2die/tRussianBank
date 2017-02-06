@@ -158,7 +158,7 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
   def filterByName(searchText: String): (Account => Boolean) = _.name.toLowerCase().replace('ё', 'е').indexOf(searchText) != -1
 
-  def userHasRights: Boolean = true //    accounts.filter(filterByTGid).size == 1
+  def userHasRights: Boolean = false //    accounts.filter(filterByTGid).size == 1
 
   def updateStartWithCommand(update: Update, message: String): Boolean =
     update.hasMessage && update.getMessage.hasText && update.getMessage.getText.toLowerCase.startsWith(message)
