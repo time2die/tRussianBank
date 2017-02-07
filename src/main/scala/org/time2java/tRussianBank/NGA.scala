@@ -57,4 +57,7 @@ object NGA {
     getValues("Держатели!A2:B23")
   }
 
+  def getAllUser(): Answer = {
+    getValues("Участники!A2:M100")
+  }
 }

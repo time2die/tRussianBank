@@ -23,27 +23,28 @@ class RussianBot extends TelegramLongPollingBot {
   private[tRussianBank] val conf: Config = ConfigFactory.load
 
   def onUpdateReceived(update: Update) {
-    new ComandProcessor(update, conf, this, List()) //convertGAtoAcconut(GoogleApiClient.getAllUser))
+    new ComandProcessor(update, conf, this, convertGAtoAcconut(NGA.getAllUser))
   }
 
-//  def convertGAtoAcconut(ga: sAnswer): List[Account] = {
-//    ga.values.toList.map(iter => {
-//      val rawAccount = iter.toList
-//      rawAccount match {
-//        case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMounthsPays :: hasCurrentMounthsPays :: xs
-//        => Account(name, tgId, vkId, city,
-//          paymentNum.toInt, strToD(paymentSum),
-//          strToInt(debtCount), strToD(currentDeb), returnDate,
-//          strToInt(earlyReturn), strToInt(delayReturn),
-//          strToB(hasLastMounthsPays), strToB(hasCurrentMounthsPays))
-//      }
-//    })
-//  }
+  def convertGAtoAcconut(ga: Answer): List[Account] = {
+    ga.values.toList.map(iter => {
+      val rawAccount = iter.toList
+      rawAccount match {
+        case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMounthsPays :: hasCurrentMounthsPays :: xs
+        => Account(name, tgId, vkId, city,
+          paymentNum.toInt, strToD(paymentSum),
+          strToInt(debtCount), strToD(currentDeb), returnDate,
+          strToInt(earlyReturn), strToInt(delayReturn),
+          strToB(hasLastMounthsPays), strToB(hasCurrentMounthsPays))
+      }
+    })
+  }
 
-  //  def strToInt(x: String): Integer = if ("" == x) 0 else x.toInt
-  //  def strToD(x: String): Double = x.replace(',', '.').toDouble
-  //  def strToB(x: String): Boolean = "" == x || "0" == x
+  def strToInt(x: String): Integer = if ("" == x) 0 else x.toInt
 
+  def strToD(x: String): Double = x.replace(',', '.').toDouble
+
+  def strToB(x: String): Boolean = "" == x || "0" == x
 
   def sendMessage(update: Update, text: String) {
     val message: SendMessage = new SendMessage().setChatId(update.getMessage.getChatId).setText(text)
