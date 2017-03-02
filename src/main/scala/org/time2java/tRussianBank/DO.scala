@@ -14,9 +14,10 @@ case class Account(name: String,
                    returnDate: String,
                    earlyReturn: Integer,
                    delayReturn: Integer,
-                   hasLastMounthsPays: Boolean,
-                   hasCurrentMounthsPays: Boolean) {
-  override def toString(): String = {
+                   hasLastMonthsPays: Boolean,
+                   hasCurrentMonthsPays: Boolean) {
+
+  override def toString: String = {
     val sb: StringBuffer = new StringBuffer
     try {
       sb.append(this.name)
@@ -32,16 +33,15 @@ case class Account(name: String,
 
       def getBooleanValueFromGAPI(value: Boolean): String = if (value) "уплачено" else "не уплачено"
 
-      sb.append("\nВзносы за прошедшие 3 месяца: " + getBooleanValueFromGAPI(this.hasLastMounthsPays))
-      sb.append("\nВзносы за текущий месяц: " + getBooleanValueFromGAPI(this.hasCurrentMounthsPays))
+      sb.append("\nВзносы за прошедшие 3 месяца: " + getBooleanValueFromGAPI(this.hasLastMonthsPays))
+      sb.append("\nВзносы за текущий месяц: " + getBooleanValueFromGAPI(this.hasCurrentMonthsPays))
     }
     catch {
-      case e: Exception => {
+      case e: Exception =>
         e.printStackTrace()
-      }
     }
     sb.toString
   }
 }
 
-case class Answer(val values: List[List[String]])
+case class Answer(values: List[List[String]])

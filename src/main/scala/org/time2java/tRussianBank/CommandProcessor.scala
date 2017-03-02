@@ -1,5 +1,8 @@
 package org.time2java.tRussianBank
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import com.typesafe.config.Config
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
@@ -7,6 +10,12 @@ import org.telegram.telegrambots.api.objects.Update
 /**
   * Created by time2die on 07.01.17.
   */
+
+object ComandProcessor{
+private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+}
+
+
 class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
   if (!(userHasRights || update.getMessage.getChatId == -29036710))
     sendMessage("У вас нет прав")
@@ -18,10 +27,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
   else if (updateStartWithCommand(update, "/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand(update, "/aboutme")) processAboutMe(update)
-
-  //  else {
-  //    processElseVariant(update)
-  //  }
 
   def processAboutMe(update: Update): Unit = {
     accounts.filter(filterByTGid) match {
@@ -76,7 +81,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     sendMessage(result)
   }
 
-
   def processSearchOperation(update: Update) {
     val text: String = try {
       update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
@@ -101,14 +105,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
       sendMessage(searchResult.head.toString)
   }
 
-  //  private[tRussianBank] def processElseVariant(update: Update) {
-  //    if (update.getMessage.getFrom.getId != update.getMessage.getChatId)
-  //      return
-  //
-  //    if (userHasRights) sendMessage("Я пока так не умею" + update.getMessage.getText + "<")
-  //    else sendMessage("У вас не достаточно прав для выполнения запроса")
-  //  }
-  //
   def processIdMessage(update: Update): Unit = {
     val message = update.getMessage
     val fromId = message.getFrom.getId
@@ -127,9 +123,10 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     sendTextToAdmin("aboutme: " + result)
   }
 
+
   def processDebtsCommand(update: Update) {
     val ga: Answer = NGA.getAllUser
-    val searchResult = accounts.filter(filterByDebs).sortBy(_.name)
+    val searchResult = accounts.filter(filterByDebs).sortWith(filterAccount)
     val sb: StringBuffer = new StringBuffer("")
     for (resultUser <- searchResult) {
       val v0: String = resultUser.name
@@ -142,6 +139,13 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
       sb.append("\n")
     }
     sendMessage(sb.toString)
+  }
+
+  def filterAccount(f:Account,s:Account):Boolean = {
+    val fDate = LocalDate.parse(f.returnDate, ComandProcessor.dateFormatter)
+    val sDate = LocalDate.parse(s.returnDate, ComandProcessor.dateFormatter)
+
+    fDate.isBefore(sDate)
   }
 
   def sendMessage(text: String) = this.bot.sendMessage(this.update, text)

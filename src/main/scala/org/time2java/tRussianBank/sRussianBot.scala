@@ -23,21 +23,26 @@ class RussianBot extends TelegramLongPollingBot {
   private[tRussianBank] val conf: Config = ConfigFactory.load
 
   def onUpdateReceived(update: Update) {
-    new ComandProcessor(update, conf, this, convertGAtoAcconut(NGA.getAllUser))
+    new ComandProcessor(update, conf, this, convertGAtoAccount(NGA.getAllUser))
   }
 
-  def convertGAtoAcconut(ga: Answer): List[Account] = {
-    ga.values.toList.map(iter => {
-      val rawAccount = iter.toList
-      rawAccount match {
-        case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMounthsPays :: hasCurrentMounthsPays :: xs
-        => Account(name, tgId, vkId, city,
-          paymentNum.toInt, strToD(paymentSum),
-          strToInt(debtCount), strToD(currentDeb), returnDate,
-          strToInt(earlyReturn), strToInt(delayReturn),
-          strToB(hasLastMounthsPays), strToB(hasCurrentMounthsPays))
-      }
-    })
+  def convertGAtoAccount(ga: Answer): List[Account] = {
+    ga.values.map {
+      case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMonthsPays :: hasCurrentMonthsPays :: xs
+      => Account(name,
+        tgId,
+        vkId,
+        city,
+        paymentNum.toInt,
+        strToD(paymentSum),
+        strToInt(debtCount),
+        strToD(currentDeb),
+        returnDate,
+        strToInt(earlyReturn),
+        strToInt(delayReturn),
+        strToB(hasLastMonthsPays),
+        strToB(hasCurrentMonthsPays))
+    }
   }
 
   def strToInt(x: String): Integer = if ("" == x) 0 else x.toInt
