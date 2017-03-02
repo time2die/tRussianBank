@@ -37,12 +37,14 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def processShout() {
     val text = update.getMessage.getText.split(" ").tail.mkString(" ")
-    if (text.isEmpty) { return }
+    if (text.isEmpty) {
+      return
+    }
 
     val userId = update.getMessage.getFrom.getId
     if (isAdmin(userId)) {
-//        List("69711013").foreach(userId => sendTextToUser(text, userId))
-              accounts.foreach(user => sendTextToUser(text, user.tgId))
+      //        List("69711013").foreach(userId => sendTextToUser(text, userId))
+      accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
     }
   }
 
