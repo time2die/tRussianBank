@@ -23,7 +23,7 @@ class RussianBot extends TelegramLongPollingBot {
   private[tRussianBank] val conf: Config = ConfigFactory.load
 
   def onUpdateReceived(update: Update) {
-    new ComandProcessor(update, conf, this, convertGAtoAccount(NGA.getAllUser))
+    new CommandProcessor(update, conf, this, convertGAtoAccount(NGA.getAllUser))
   }
 
   def convertGAtoAccount(ga: Answer): List[Account] = {

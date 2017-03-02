@@ -11,32 +11,51 @@ import org.telegram.telegrambots.api.objects.Update
   * Created by time2die on 07.01.17.
   */
 
-object ComandProcessor {
+object CommandProcessor {
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 }
 
 
-class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
-  if (!(userHasRights || update.getMessage.getChatId == -29036710))
-    sendMessage("У вас нет прав")
-  else if (updateStartWithCommand(update, "/status")) processStatusCommand(update)
+class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
+  if (!(userHasRights || isMainChatRoom)) sendMessage("У вас нет прав")
+  else if (updateStartWithCommand("/status")) processStatusCommand()
+  else if (updateStartWithCommand("/search")) processSearchOperation()
+  else if (updateStartWithCommand("/debts")) processDebtsCommand()
+  else if (updateStartWithCommand("/cards")) processCardsCommand()
 
-  else if (updateStartWithCommand(update, "/search")) processSearchOperation(update)
-  else if (updateStartWithCommand(update, "/debts")) processDebtsCommand(update)
-  else if (updateStartWithCommand(update, "/cards")) processCardsCommand(update)
+  else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
+  else if (updateStartWithCommand("/aboutme")) processAboutMe()
+  else if (updateStartWithCommand("/shout")) processShout()
 
-  else if (updateStartWithCommand(update, "/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
-  else if (updateStartWithCommand(update, "/aboutme")) processAboutMe(update)
 
-  def processAboutMe(update: Update): Unit = {
+  def processAboutMe() {
     accounts.filter(filterByTGid) match {
       case user :: nil => sendMessage(user.toString())
-      case _ => processIdMessage(update)
+      case _ => processIdMessage()
     }
   }
 
+  def processShout() {
+    val text = update.getMessage.getText.split(" ").tail.mkString(" ")
+    if (text.isEmpty) { return }
 
-  def processStatusCommand(update: Update) {
+    val userId = update.getMessage.getFrom.getId
+    if (isAdmin(userId)) {
+//        List("69711013").foreach(userId => sendTextToUser(text, userId))
+              accounts.foreach(user => sendTextToUser(text, user.tgId))
+    }
+  }
+
+  def isMainChatRoom = update.getMessage.getChatId == -29036710
+
+  def isAdmin(userId: Integer): Boolean = {
+    import collection.JavaConversions._
+    val admins = conf.getStringList("admins").toList
+    admins.contains(userId + "")
+  }
+
+
+  def processStatusCommand() {
     val values = NGA.getStatus().values
 
     val result: StringBuilder = new StringBuilder
@@ -57,20 +76,20 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     sendMessage(result.toString())
   }
 
-  def processCardsCommand(update: Update) {
+  def processCardsCommand() {
     val ga: Answer = NGA.getCardHolder()
-    var number: String = ga.values(0)(0)
-    var summ: String = ga.values(0)(1)
-    var city: String = ga.values(2)(0)
+    var number: String = ga.values.head.head
+    var summ: String = ga.values.head(1)
+    var city: String = ga.values(2).head
     var result: String = ""
     result += "номер карты: " + number
     result += "\n"
     result += "сумма на карте: " + summ
     result += "\n"
     result += "город: " + city
-    number = ga.values(17)(0)
+    number = ga.values(17).head
     summ = ga.values(17)(1)
-    city = ga.values(19)(0)
+    city = ga.values(19).head
     if ("" != number) {
       result += "\n\nномер карты: " + number
       result += "\n"
@@ -81,7 +100,7 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     sendMessage(result)
   }
 
-  def processSearchOperation(update: Update) {
+  def processSearchOperation() {
     val text: String = try {
       update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
     }
@@ -94,7 +113,7 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     val searchResult: List[Account] = accounts.filter(filterByName(text))
 
     def needProcessPositiveCase(): Boolean = {
-      if (searchResult.size == 0)
+      if (searchResult.isEmpty)
         sendMessage("Совпадений нет")
       else if (searchResult.size > 1)
         sendMessage("Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
@@ -105,13 +124,13 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
       sendMessage(searchResult.head.toString)
   }
 
-  def processIdMessage(update: Update): Unit = {
+  def processIdMessage() {
     val message = update.getMessage
     val fromId = message.getFrom.getId
     val fName = message.getFrom.getFirstName
     val sName = message.getFrom.getLastName
 
-    val result = s"fromId:${fromId} from:${fName} ${sName}"
+    val result = s"fromId:$fromId from:$fName $sName"
 
 
     if (fromId == message.getChatId) {
@@ -124,8 +143,8 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
   }
 
 
-  def processDebtsCommand(update: Update) {
-    val ga: Answer = NGA.getAllUser
+  def processDebtsCommand() {
+    val ga: Answer = NGA.getAllUser()
     val searchResult = accounts.filter(filterByDebs).sortWith(filterAccount)
     val sb: StringBuffer = new StringBuffer("")
     for (resultUser <- searchResult) {
@@ -142,8 +161,8 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
   }
 
   def filterAccount(f: Account, s: Account): Boolean = {
-    val fDate = LocalDate.parse(f.returnDate, ComandProcessor.dateFormatter)
-    val sDate = LocalDate.parse(s.returnDate, ComandProcessor.dateFormatter)
+    val fDate = LocalDate.parse(f.returnDate, CommandProcessor.dateFormatter)
+    val sDate = LocalDate.parse(s.returnDate, CommandProcessor.dateFormatter)
 
     if (fDate.compareTo(sDate) != 0) fDate.isBefore(sDate)
     else if (f.currentDeb.compareTo(s.currentDeb) >= 0) false else true
@@ -151,14 +170,18 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
   def sendMessage(text: String) = this.bot.sendMessage(this.update, text)
 
-  def sendTextToAdmin(text: String): Unit = {
+  def sendTextToAdmin(text: String) {
+    sendTextToUser(text, "77960859l")
+  }
+
+  def sendTextToUser(text: String, userId: String) {
     val log = new SendMessage()
-    log.setChatId(77960859l)
+    log.setChatId(userId)
     log.setText(text)
     bot.sendMessage(log)
   }
 
-  def userHasRights: Boolean = accounts.filter(filterByTGid).size == 1
+  def userHasRights: Boolean = accounts.count(filterByTGid) == 1
 
   def filterByDebs: (Account => Boolean) = _.currentDeb > 0
 
@@ -166,6 +189,6 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
 
   def filterByName(searchText: String): (Account => Boolean) = _.name.toLowerCase().replace('ё', 'е').indexOf(searchText) != -1
 
-  def updateStartWithCommand(update: Update, message: String): Boolean =
+  def updateStartWithCommand(message: String): Boolean =
     update.hasMessage && update.getMessage.hasText && update.getMessage.getText.toLowerCase.startsWith(message)
 }
