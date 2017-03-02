@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import com.typesafe.config.Config
+import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
 
@@ -13,6 +14,7 @@ import org.telegram.telegrambots.api.objects.Update
 
 object CommandProcessor {
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+  val logger = LoggerFactory.getLogger("errors")
 }
 
 
@@ -43,8 +45,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
     val userId = update.getMessage.getFrom.getId
     if (isAdmin(userId)) {
-      //        List("69711013").foreach(userId => sendTextToUser(text, userId))
-      accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
+//      List("69711013123").foreach(userId => sendTextToUser(text, userId))
+            accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
     }
   }
 
@@ -177,10 +179,15 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def sendTextToUser(text: String, userId: String) {
-    val log = new SendMessage()
-    log.setChatId(userId)
-    log.setText(text)
-    bot.sendMessage(log)
+    try {
+      val log = new SendMessage()
+      log.setChatId(userId)
+      log.setText(text)
+      bot.sendMessage(log)
+    } catch {
+      case e: Throwable => e.printStackTrace(); CommandProcessor.logger.error(e.getLocalizedMessage)
+      case any => CommandProcessor.logger.error(s"error:$any")
+    }
   }
 
   def userHasRights: Boolean = accounts.count(filterByTGid) == 1

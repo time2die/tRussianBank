@@ -1,0 +1,21 @@
+<configuration>
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/errors.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/errors.log.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>ts=%d{yyyy-MM-dd-HH:mm:ss.SSS}, %msg%n</pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+    <logger name="errors" level="INFO" additivity="false">
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
+</configuration>
