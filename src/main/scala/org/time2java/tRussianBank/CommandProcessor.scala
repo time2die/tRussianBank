@@ -11,8 +11,8 @@ import org.telegram.telegrambots.api.objects.Update
   * Created by time2die on 07.01.17.
   */
 
-object ComandProcessor{
-private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+object ComandProcessor {
+  private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 }
 
 
@@ -141,11 +141,12 @@ class ComandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: L
     sendMessage(sb.toString)
   }
 
-  def filterAccount(f:Account,s:Account):Boolean = {
+  def filterAccount(f: Account, s: Account): Boolean = {
     val fDate = LocalDate.parse(f.returnDate, ComandProcessor.dateFormatter)
     val sDate = LocalDate.parse(s.returnDate, ComandProcessor.dateFormatter)
 
-    fDate.isBefore(sDate)
+    if (fDate.compareTo(sDate) != 0) fDate.isBefore(sDate)
+    else if (f.currentDeb.compareTo(s.currentDeb) >= 0) false else true
   }
 
   def sendMessage(text: String) = this.bot.sendMessage(this.update, text)
