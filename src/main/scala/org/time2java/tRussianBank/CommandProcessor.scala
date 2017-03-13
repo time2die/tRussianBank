@@ -37,7 +37,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
   }
 
-  def processShout() {
+  def processShout() {18
     val text = update.getMessage.getText.split(" ").tail.mkString(" ")
     if (text.isEmpty) {
       return
@@ -172,7 +172,10 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     else if (f.currentDeb.compareTo(s.currentDeb) >= 0) false else true
   }
 
-  def sendMessage(text: String) = this.bot.sendMessage(this.update, text)
+  def sendMessage(text: String) = {
+    this.bot.sendMessage(this.update, text)
+    CommandProcessor.logger.debug(s"send: $text to ${this.update.getMessage.getChatId}")
+  }
 
   def sendTextToAdmin(text: String) {
     sendTextToUser(text, "77960859l")
@@ -184,8 +187,11 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       log.setChatId(userId)
       log.setText(text)
       bot.sendMessage(log)
+      CommandProcessor.logger.debug(s"send: $text to $userId")
     } catch {
-      case e: Throwable => e.printStackTrace(); CommandProcessor.logger.error(e.getLocalizedMessage)
+      case e: Throwable =>
+        e.printStackTrace()
+        CommandProcessor.logger.error(e.getLocalizedMessage)
       case any => CommandProcessor.logger.error(s"error:$any")
     }
   }
