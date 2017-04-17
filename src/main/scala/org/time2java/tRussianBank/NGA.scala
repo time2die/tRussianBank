@@ -50,7 +50,7 @@ object NGA {
   }
 
   def getStatus(): Answer = {
-    getValues("A5:B7")
+    getValues("A7:B9")
   }
 
   def getCardHolder(): Answer = {
