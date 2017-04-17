@@ -85,21 +85,27 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     var number: String = ga.values.head.head
     var summ: String = ga.values.head(1)
     var city: String = ga.values(2).head
+    var bankName:String = ga.values(3).head
+    var systemName:String = ga.values(4).head
+
     var result: String = ""
-    result += "номер карты: " + number
-    result += "\n"
-    result += "сумма на карте: " + summ
-    result += "\n"
-    result += "город: " + city
+
+    result += s"номер карты: $number\n"
+    result += s"сумма на карте: $summ\n"
+    result += s"город: $city\n"
+    result += s"карта: $bankName  $systemName"
+
     number = ga.values(17).head
     summ = ga.values(17)(1)
     city = ga.values(19).head
+    bankName = ga.values(20).head
+    systemName= ga.values(21).head
+
     if ("" != number) {
-      result += "\n\nномер карты: " + number
-      result += "\n"
-      result += "сумма на карте: " + summ
-      result += "\n"
-      result += "город: " + city
+      result += s"\n\nномер карты: $number\n"
+      result += s"сумма на карте: $summ\n"
+      result += s"город: $city\n"
+      result += s"карта: $bankName $systemName"
     }
     sendMessage(result)
   }
