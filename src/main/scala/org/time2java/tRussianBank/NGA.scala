@@ -60,4 +60,8 @@ object NGA {
   def getAllUser(): Answer = {
     getValues("Участники!A2:M100")
   }
+
+  def getDebsUser():Answer = {
+    getValues("Займы!A2:C100")
+  }
 }

@@ -3,19 +3,30 @@ package org.time2java.tRussianBank
 /**
   * Created by time2die on 07.01.17.
   */
-case class Account(name: String,
-                   tgId: String,
-                   vkID: String,
-                   city: String,
-                   paymentNum: Int,
-                   paymentSum: Double,
-                   debtCount: Int,
-                   currentDeb: Double,
-                   returnDate: String,
-                   earlyReturn: Integer,
-                   delayReturn: Integer,
-                   hasLastMonthsPays: Boolean,
-                   hasCurrentMonthsPays: Boolean) {
+
+trait Account {
+  val name: String
+  val currentDeb: Double
+  val returnDate: String
+}
+
+case class PureAccount(name: String,
+                       currentDeb: Double,
+                       returnDate: String) extends Account
+
+case class FullAccount(name: String,
+                       tgId: String,
+                       vkID: String,
+                       city: String,
+                       paymentNum: Int,
+                       paymentSum: Double,
+                       debtCount: Int,
+                       currentDeb: Double,
+                       returnDate: String,
+                       earlyReturn: Integer,
+                       delayReturn: Integer,
+                       hasLastMonthsPays: Boolean,
+                       hasCurrentMonthsPays: Boolean) extends Account {
 
   override def toString: String = {
     val sb: StringBuffer = new StringBuffer

@@ -18,7 +18,7 @@ object CommandProcessor {
 }
 
 
-class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[Account]) {
+class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[FullAccount]) {
   if (!(userHasRights || isMainChatRoom)) sendMessage("У вас нет прав")
   else if (updateStartWithCommand("/status")) processStatusCommand()
   else if (updateStartWithCommand("/search")) processSearchOperation()
@@ -37,7 +37,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
   }
 
-  def processShout() {18
+  def processShout() {
+    18
     val text = update.getMessage.getText.split(" ").tail.mkString(" ")
     if (text.isEmpty) {
       return
@@ -45,8 +46,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
     val userId = update.getMessage.getFrom.getId
     if (isAdmin(userId)) {
-//      List("69711013123").foreach(userId => sendTextToUser(text, userId))
-            accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
+      //      List("69711013123").foreach(userId => sendTextToUser(text, userId))
+      accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
     }
   }
 
@@ -85,8 +86,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     var number: String = ga.values.head.head
     var summ: String = ga.values.head(1)
     var city: String = ga.values(2).head
-    var bankName:String = ga.values(3).head
-    var systemName:String = ga.values(4).head
+    var bankName: String = ga.values(3).head
+    var systemName: String = ga.values(4).head
 
     var result: String = ""
 
@@ -99,7 +100,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     summ = ga.values(17)(1)
     city = ga.values(19).head
     bankName = ga.values(20).head
-    systemName= ga.values(21).head
+    systemName = ga.values(21).head
 
     if ("" != number) {
       result += s"\n\nномер карты: $number\n"
@@ -120,7 +121,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       }
     }
 
-    val searchResult: List[Account] = accounts.filter(filterByName(text))
+    val searchResult: List[FullAccount] = accounts.filter(filterByName(text))
 
     def needProcessPositiveCase(): Boolean = {
       if (searchResult.isEmpty)
@@ -154,8 +155,9 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
 
   def processDebtsCommand() {
-    val ga: Answer = NGA.getAllUser()
-    val searchResult = accounts.filter(filterByDebs).sortWith(filterAccount)
+
+    val searchResult: List[Account] = buildAccountsFromDebts(NGA.getDebsUser())
+
     val sb: StringBuffer = new StringBuffer("")
     for (resultUser <- searchResult) {
       val v0: String = resultUser.name
@@ -170,7 +172,14 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     sendMessage(sb.toString)
   }
 
-  def filterAccount(f: Account, s: Account): Boolean = {
+  def buildAccountsFromDebts(ga: Answer): List[PureAccount] = ga.values.map(
+    {
+      case name :: debt :: returnDate :: tail => PureAccount(name, debt.toDouble, returnDate)
+      case _ => PureAccount("", 0.0, "")
+    }
+  ).filter(filterByDebs).sortWith(filterAccount)
+
+  def filterAccount(f: PureAccount, s: PureAccount): Boolean = {
     val fDate = LocalDate.parse(f.returnDate, CommandProcessor.dateFormatter)
     val sDate = LocalDate.parse(s.returnDate, CommandProcessor.dateFormatter)
 
@@ -206,9 +215,9 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def filterByDebs: (Account => Boolean) = _.currentDeb > 0
 
-  def filterByTGid: (Account => Boolean) = _.tgId == update.getMessage.getFrom.getId.toString
+  def filterByTGid: (FullAccount => Boolean) = _.tgId == update.getMessage.getFrom.getId.toString
 
-  def filterByName(searchText: String): (Account => Boolean) = _.name.toLowerCase().replace('ё', 'е').indexOf(searchText) != -1
+  def filterByName(searchText: String): (FullAccount => Boolean) = _.name.toLowerCase().replace('ё', 'е').indexOf(searchText) != -1
 
   def updateStartWithCommand(message: String): Boolean =
     update.hasMessage && update.getMessage.hasText && update.getMessage.getText.toLowerCase.startsWith(message)

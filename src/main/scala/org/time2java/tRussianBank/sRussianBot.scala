@@ -26,10 +26,10 @@ class RussianBot extends TelegramLongPollingBot {
     new CommandProcessor(update, conf, this, convertGAtoAccount(NGA.getAllUser))
   }
 
-  def convertGAtoAccount(ga: Answer): List[Account] = {
+  def convertGAtoAccount(ga: Answer): List[FullAccount] = {
     ga.values.map {
       case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMonthsPays :: hasCurrentMonthsPays :: xs
-      => Account(name,
+      => FullAccount(name,
         tgId,
         vkId,
         city,
