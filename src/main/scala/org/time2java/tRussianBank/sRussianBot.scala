@@ -32,7 +32,6 @@ class RussianBot extends TelegramLongPollingBot {
     ga.values.map {
       case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMonthsPays :: hasCurrentMonthsPays :: xs
       =>
-        System.err.print(s"$name " + s" $tgId " + s" $vkId " + s" $city " + s" $paymentNum " + s" $paymentSum " + s" $debtCount " + s" $currentDeb " + s" $returnDate " + " $earlyReturn " + " $delayReturn " + " $hasLastMonthsPays " + " $hasCurrentMonthsPays " + " $xs")
         FullAccount(name,
           tgId,
           vkId,
