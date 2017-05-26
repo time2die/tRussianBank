@@ -7,6 +7,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.exceptions.TelegramApiException
 import org.telegram.telegrambots.{ApiContextInitializer, TelegramBotsApi}
 
+import scala.util.{Failure, Success, Try}
+
 /**
   * Created by time2die on 05.01.17
   */
@@ -29,25 +31,33 @@ class RussianBot extends TelegramLongPollingBot {
   def convertGAtoAccount(ga: Answer): List[FullAccount] = {
     ga.values.map {
       case name :: tgId :: vkId :: city :: paymentNum :: paymentSum :: debtCount :: currentDeb :: returnDate :: earlyReturn :: delayReturn :: hasLastMonthsPays :: hasCurrentMonthsPays :: xs
-      => FullAccount(name,
-        tgId,
-        vkId,
-        city,
-        paymentNum.toInt,
-        strToD(paymentSum),
-        strToInt(debtCount),
-        strToD(currentDeb),
-        returnDate,
-        strToInt(earlyReturn),
-        strToInt(delayReturn),
-        strToB(hasLastMonthsPays),
-        strToB(hasCurrentMonthsPays))
+      =>
+        System.err.print(s"$name " + s" $tgId " + s" $vkId " + s" $city " + s" $paymentNum " + s" $paymentSum " + s" $debtCount " + s" $currentDeb " + s" $returnDate " + " $earlyReturn " + " $delayReturn " + " $hasLastMonthsPays " + " $hasCurrentMonthsPays " + " $xs")
+        FullAccount(name,
+          tgId,
+          vkId,
+          city,
+          paymentNum.toInt,
+          strToD(paymentSum),
+          strToInt(debtCount),
+          strToD(currentDeb),
+          returnDate,
+          strToInt(earlyReturn),
+          strToInt(delayReturn),
+          strToB(hasLastMonthsPays),
+          strToB(hasCurrentMonthsPays))
     }
   }
 
   def strToInt(x: String): Integer = if ("" == x) 0 else x.toInt
 
-  def strToD(x: String): Double = x.replace(',', '.').toDouble
+  def strToD(x: String): Double = Try {
+    x.replace(',', '.').toDouble
+  } match {
+    case Success(x: Double) => x
+    case Failure(f) => 0.0d
+  }
+
 
   def strToB(x: String): Boolean = "" == x || "0" == x
 
