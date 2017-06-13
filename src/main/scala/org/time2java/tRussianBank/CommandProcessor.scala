@@ -27,9 +27,32 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
+  else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
   else if (updateStartWithCommand("/shout")) processShout()
 
 
+  def processAboutMyPayment(): Unit = {
+    if (isMainChatRoom)  sendMessage("Этот функционал работает только в личных сообщениях")
+    else {
+
+      val payments = NGA.getAllPayments()
+
+      val date = payments.values.head.tail.tail.tail
+      val userPayments = payments.values.tail
+      val user = accounts.filter(filterByTGid).head
+      val userPaymentsHistory = userPayments.filter(_.head == user.name).head.tail.tail.tail
+      val zipDateMoney = date.zip(userPaymentsHistory).filter(_._2 != "!")
+
+      val text: StringBuilder = new StringBuilder("Статистика по платежам\n")
+      zipDateMoney.foreach(f => {
+        val when = f._1
+        val howMany = f._2
+        if (howMany != "") text.append(s"$when - $howMany рублей\n") else text.append(s"$when - не уплочено\n")
+      })
+
+      sendMessage(s"$text")
+    }
+  }
   def processAboutMe() {
     accounts.filter(filterByTGid) match {
       case user :: nil => sendMessage(user.toString())
@@ -38,7 +61,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def processShout() {
-    18
     val text = update.getMessage.getText.split(" ").tail.mkString(" ")
     if (text.isEmpty) {
       return

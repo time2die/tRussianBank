@@ -64,4 +64,8 @@ object NGA {
   def getDebsUser():Answer = {
     getValues("Займы!A2:C100")
   }
+
+  def getAllPayments():Answer = {
+    getValues("Взносы!A1:ZZ100")
+  }
 }
