@@ -110,6 +110,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     var city: String = ga.values(2).head
     var bankName: String = ga.values(3).head
     var systemName: String = ga.values(4).head
+    var link:String = ga.values(5).head
 
     var result: String = ""
 
@@ -117,6 +118,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     result += s"сумма на карте: $summ\n"
     result += s"город: $city\n"
     result += s"карта: $bankName  $systemName"
+
+    if(link != "") result += s"\nПополнить без комиссии можно по ссылке:\n$link"
 
     number = ga.values(17).head
     summ = ga.values(17)(1)

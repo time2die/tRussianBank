@@ -54,7 +54,7 @@ object NGA {
   }
 
   def getCardHolder(): Answer = {
-    getValues("Держатели!A2:B23")
+    getValues("Держатели!A2:B25")
   }
 
   def getAllUser(): Answer = {
