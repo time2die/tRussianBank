@@ -28,7 +28,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
-  else if (updateStartWithCommand("/shout")) processShout()
 
 
   def processAboutMyPayment(): Unit = {
@@ -60,20 +59,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
   }
 
-  def processShout() {
-    val text = update.getMessage.getText.split(" ").tail.mkString(" ")
-    if (text.isEmpty) {
-      return
-    }
 
-    val userId = update.getMessage.getFrom.getId
-    if (isAdmin(userId)) {
-      //      List("69711013123").foreach(userId => sendTextToUser(text, userId))
-      accounts.filter(_.tgId.isEmpty == false).foreach(user => sendTextToUser(text, user.tgId))
-    }
-  }
-
-  def isMainChatRoom = update.getMessage.getChatId == -29036710
+//  def isMainChatRoom = update.getMessage.getChatId == -29036710
 
   def isAdmin(userId: Integer): Boolean = {
     import collection.JavaConversions._
@@ -218,8 +205,9 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def sendTextToAdmin(text: String) {
-    sendTextToUser(text, "77960859l")
-    sendTextToUser(text, "69711013")
+    import collection.JavaConversions._
+    val admins = conf.getStringList("admins").toList
+    admins.foreach( id => sendTextToUser(text, id) )
   }
 
   def sendTextToUser(text: String, userId: String) {
