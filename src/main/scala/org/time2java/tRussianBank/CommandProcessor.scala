@@ -219,6 +219,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def sendTextToAdmin(text: String) {
     sendTextToUser(text, "77960859l")
+    sendTextToUser(text, "69711013")
   }
 
   def sendTextToUser(text: String, userId: String) {
