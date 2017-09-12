@@ -8,3 +8,5 @@
 src/test/scala/
 /StoredCredential
 /client_secret.json
+log/
+out/

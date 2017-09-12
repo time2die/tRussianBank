@@ -19,7 +19,7 @@ object CommandProcessor {
 
 
 class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[FullAccount]) {
-  if (!(userHasRights || isMainChatRoom)) sendMessage("У вас нет прав")
+  if (!(userHasRights || isMainChatRoom)) processIdMessage
   else if (updateStartWithCommand("/status")) processStatusCommand()
   else if (updateStartWithCommand("/search")) processSearchOperation()
   else if (updateStartWithCommand("/debts")) processDebtsCommand()
@@ -153,13 +153,13 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val fName = message.getFrom.getFirstName
     val sName = message.getFrom.getLastName
 
-    val result = s"fromId:$fromId from:$fName $sName"
+    val result = s"fromId:$fromId from:$fName $sName\n${message.getText}"
 
 
-    if (fromId == message.getChatId) {
+    if (isMainChatRoom) {
       sendMessage("Информации о этом пользователи пока нет в базе, все необходмые данные были отправлены держателю. Подождите, пожалуйста, пока их обработают")
     } else {
-      sendMessage("Мы вас запомнили. Попробуйте позже.")
+      sendMessage("Мы вас запомнили. Дайте нам время,чтобы обработать запрос.")
     }
 
     sendTextToAdmin("aboutme: " + result)
