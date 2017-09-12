@@ -60,7 +60,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
 
-//  def isMainChatRoom = update.getMessage.getChatId == -29036710
+  def isMainChatRoom = update.getMessage.getChatId == -29036710
 
   def isAdmin(userId: Integer): Boolean = {
     import collection.JavaConversions._
