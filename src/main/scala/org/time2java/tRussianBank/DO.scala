@@ -34,6 +34,7 @@ case class FullAccount(name: String,
       sb.append(this.name)
       sb.append("\nВсего взносов: " + this.paymentNum)
       sb.append("\nНа сумму: " + this.paymentSum)
+      sb.append("\nx5: " + this.paymentSum.toInt*5)
       sb.append("\nВсего займов: " + this.debtCount)
       if ("" != this.returnDate) {
         sb.append("\nСейчас должен: " + this.currentDeb)

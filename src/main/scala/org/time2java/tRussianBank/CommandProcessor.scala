@@ -7,10 +7,14 @@ import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
+import scala.util.{Failure, Success, Try}
+import scala.collection.JavaConverters._
 
 /**
   * Created by time2die on 07.01.17.
   */
+
+
 
 object CommandProcessor {
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -19,6 +23,7 @@ object CommandProcessor {
 
 
 class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[FullAccount]) {
+
   if (!(userHasRights || isMainChatRoom)) processIdMessage
   else if (updateStartWithCommand("/status")) processStatusCommand()
   else if (updateStartWithCommand("/search")) processSearchOperation()
@@ -28,10 +33,11 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
+  else sendMessage("я так не умею")
 
 
   def processAboutMyPayment(): Unit = {
-    if (isMainChatRoom)  sendMessage("Этот функционал работает только в личных сообщениях")
+    if (isMainChatRoom) sendMessage("Этот функционал работает только в личных сообщениях")
     else {
 
       val payments = NGA.getAllPayments()
@@ -52,6 +58,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       sendMessage(s"$text")
     }
   }
+
   def processAboutMe() {
     accounts.filter(filterByTGid) match {
       case user :: nil => sendMessage(user.toString())
@@ -63,8 +70,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   def isMainChatRoom = update.getMessage.getChatId == -29036710
 
   def isAdmin(userId: Integer): Boolean = {
-    import collection.JavaConversions._
-    val admins = conf.getStringList("admins").toList
+    
+    val admins = conf.getStringList("admins")
     admins.contains(userId + "")
   }
 
@@ -97,7 +104,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     var city: String = ga.values(2).head
     var bankName: String = ga.values(3).head
     var systemName: String = ga.values(4).head
-    var link:String = ga.values(5).head
+    var link: String = ga.values(5).head
 
     var result: String = ""
 
@@ -106,7 +113,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     result += s"город: $city\n"
     result += s"карта: $bankName  $systemName"
 
-    if(link != "") result += s"\nПополнить без комиссии можно по ссылке:\n$link"
+    if (link != "") result += s"\nПополнить без комиссии можно по ссылке:\n$link"
 
     number = ga.values(17).head
     summ = ga.values(17)(1)
@@ -124,27 +131,38 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def processSearchOperation() {
-    val text: String = try {
-      update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
-    }
-    catch {
-      case ex: ArrayIndexOutOfBoundsException => {
-        return sendMessage("Следует указать кого вы ищите.\nПример работы: /search урбанист")
+    if (isMainChatRoom) sendMessage("Лучше этим не пользоваться в групповом чате.")
+    else processMessage
+
+
+    def processMessage = {
+      val text: Try[String] = Try {
+        update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
+      }
+
+      text match {
+        case Failure(_: ArrayIndexOutOfBoundsException) => sendMessage("Следует указать кого вы ищите.")
+        case Success(text: String) => searchAndSend(text)
+        case _@(Failure(_) | Success(_)) => sendMessage("Свяжитесь с разработчиком.")
       }
     }
 
-    val searchResult: List[FullAccount] = accounts.filter(filterByName(text))
 
-    def needProcessPositiveCase(): Boolean = {
-      if (searchResult.isEmpty)
-        sendMessage("Совпадений нет")
-      else if (searchResult.size > 1)
-        sendMessage("Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
-      true
+    def searchAndSend(text: String) = {
+      val searchResult: List[FullAccount] = accounts.filter(filterByName(text))
+
+      def needProcessPositiveCase(): Boolean = {
+        if (searchResult.isEmpty)
+          sendMessage("Совпадений нет")
+        else if (searchResult.size > 1)
+          sendMessage("Количество совпадений: " + searchResult.size + "\nИспользуйте другой запрос")
+        true
+      }
+
+      if (needProcessPositiveCase())
+        sendMessage(searchResult.head.toString)
     }
 
-    if (needProcessPositiveCase())
-      sendMessage(searchResult.head.toString)
   }
 
   def processIdMessage() {
@@ -173,9 +191,17 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val sb: StringBuffer = new StringBuffer("")
     for (resultUser <- searchResult) {
       val v0: String = resultUser.name
-      val v6: String = resultUser.currentDeb.toString
+      var v6: String = resultUser.currentDeb.toString
       var v7: String = resultUser.returnDate
-      v7 = v7.split("\\.")(0) + "." + v7.split("\\.")(1)
+      //      v7 = v7.split("\\.")(0) + "." + v7.split("\\.")(1)
+      v7 = v7.replace(".20", ".")
+
+      v6 = v6.indexOf('.') match {
+        case -1 => v6
+        case i: Int => v6.substring(0, i)
+      }
+
+
       sb.append(v0)
       sb.append(": " + v6)
       sb.append("\tдо " + v7)
@@ -205,9 +231,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def sendTextToAdmin(text: String) {
-    import collection.JavaConversions._
-    val admins = conf.getStringList("admins").toList
-    admins.foreach( id => sendTextToUser(text, id) )
+    val admins = conf.getStringList("admins").asScala
+    admins.foreach(id => sendTextToUser(text, id))
   }
 
   def sendTextToUser(text: String, userId: String) {
