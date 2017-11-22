@@ -7,13 +7,13 @@ import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
-import scala.util.{Failure, Success, Try}
+
 import scala.collection.JavaConverters._
+import scala.util.{Failure, Success, Try}
 
 /**
   * Created by time2die on 07.01.17.
   */
-
 
 
 object CommandProcessor {
@@ -33,7 +33,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
-  else sendMessage("я так не умею")
 
 
   def processAboutMyPayment(): Unit = {
@@ -70,7 +69,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   def isMainChatRoom = update.getMessage.getChatId == -29036710
 
   def isAdmin(userId: Integer): Boolean = {
-    
+
     val admins = conf.getStringList("admins")
     admins.contains(userId + "")
   }
@@ -134,7 +133,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     if (isMainChatRoom) sendMessage("Лучше этим не пользоваться в групповом чате.")
     else processMessage
 
-
     def processMessage = {
       val text: Try[String] = Try {
         update.getMessage.getText.split(" ")(1).toLowerCase.replace('ё', 'е')
@@ -146,7 +144,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
         case _@(Failure(_) | Success(_)) => sendMessage("Свяжитесь с разработчиком.")
       }
     }
-
 
     def searchAndSend(text: String) = {
       val searchResult: List[FullAccount] = accounts.filter(filterByName(text))
@@ -162,7 +159,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       if (needProcessPositiveCase())
         sendMessage(searchResult.head.toString)
     }
-
   }
 
   def processIdMessage() {
