@@ -4,7 +4,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import com.typesafe.config.Config
-import org.slf4j.LoggerFactory
 import org.telegram.telegrambots.api.methods.send.SendMessage
 import org.telegram.telegrambots.api.objects.Update
 
@@ -18,7 +17,6 @@ import scala.util.{Failure, Success, Try}
 
 object CommandProcessor {
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-  val logger = LoggerFactory.getLogger("errors")
 }
 
 
@@ -223,7 +221,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def sendMessage(text: String) = {
     this.bot.sendMessage(this.update, text)
-    CommandProcessor.logger.debug(s"send: $text to ${this.update.getMessage.getChatId}")
   }
 
   def sendTextToAdmin(text: String) {
@@ -237,12 +234,10 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       log.setChatId(userId)
       log.setText(text)
       bot.sendMessage(log)
-      CommandProcessor.logger.debug(s"send: $text to $userId")
     } catch {
       case e: Throwable =>
         e.printStackTrace()
-        CommandProcessor.logger.error(e.getLocalizedMessage)
-      case any => CommandProcessor.logger.error(s"error:$any")
+      case any => println(s"error:$any")
     }
   }
 
