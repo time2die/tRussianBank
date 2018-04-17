@@ -39,3 +39,11 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.2'
     compile group: 'org.telegram', name: 'telegrambots', version: '2.4.3'
 }
+
+startScripts {
+    doLast {
+        unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', 'DEFAULT_JVM_OPTS="-Xmx80m"')
+    }
+}
+
+applicationDefaultJvmArgs = ["-Xmx80m"]
