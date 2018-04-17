@@ -22,7 +22,7 @@ object Main {
 object RussianBot extends RussianBot
 
 class RussianBot extends TelegramLongPollingBot {
-  private[tRussianBank] val conf: Config = ConfigFactory.load
+  implicit val conf: Config = ConfigFactory.load
 
   def onUpdateReceived(update: Update) {
     new CommandProcessor(update, conf, this, convertGAtoAccount(NGA.getAllUser))

@@ -27,6 +27,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/search")) processSearchOperation()
   else if (updateStartWithCommand("/debts")) processDebtsCommand()
   else if (updateStartWithCommand("/cards")) processCardsCommand()
+  else if (updateStartWithCommand("/proxy")) processProxyCommand()
 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
@@ -92,6 +93,18 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
 
     sendMessage(result.toString())
+  }
+
+  def buildProxyLink():String = {
+    val server = conf.getAnyRef("server").toString
+    val port= conf.getAnyRef("port").toString
+    val user = conf.getAnyRef("proxyUser").toString
+    val pass = conf.getAnyRef("pass").toString
+    s"https://t.me/socks?server=$server&port=$port&user=$user&pass=$pass"
+  }
+
+  def processProxyCommand(): Unit = {
+    sendMessage(s"Нажмите на ссылку чтобы активировать прокси:\n${buildProxyLink()}")
   }
 
   def processCardsCommand() {
