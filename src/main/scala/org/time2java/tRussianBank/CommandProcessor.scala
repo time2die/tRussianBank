@@ -217,9 +217,13 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     sendMessage(sb.toString)
   }
 
+  def getSafeDouble(in:String):Double = Try[Double]{
+    in.replace(',','.').toDouble
+  }.getOrElse(-1d)
+
   def buildAccountsFromDebts(ga: Answer): List[PureAccount] = ga.values.map(
     {
-      case name :: debt :: returnDate :: tail => PureAccount(name, debt.replace(',','.').toDouble, returnDate)
+      case name :: debt :: returnDate :: tail => PureAccount(name, getSafeDouble(debt), returnDate)
       case _ => PureAccount("", 0.0, "")
     }
   ).filter(filterByDebs).sortWith(filterAccount)
