@@ -64,7 +64,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   def processDuckList(): Unit = {
     val sb: StringBuilder = new StringBuilder()
 
-    val hasRights: List[FullAccount] = accounts.filter(_.hasLastMonthsPays).filter(_.currentDeb.toInt =< 0)
+    val hasRights: List[FullAccount] = accounts.filter(_.hasLastMonthsPays).filter(_.currentDeb.toInt <= 0)
     sb.append("Следующие господа не имеют долгов и оплатили последние 3 месяца:").append("\n")
     hasRights.foreach { iter =>
       sb.append("-")
