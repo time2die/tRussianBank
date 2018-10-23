@@ -69,6 +69,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     hasRights.foreach { iter =>
       sb.append("-")
         .append(iter.name)
+        .append("\n")
     }
     sb.append("\n")
 
