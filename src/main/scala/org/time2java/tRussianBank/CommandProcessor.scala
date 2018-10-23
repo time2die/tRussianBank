@@ -29,7 +29,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/cards")) processCardsCommand()
   else if (updateStartWithCommand("/proxy")) processProxyCommand()
 
-  else if (updateStartWithCommand("/duckList")) processDuckList()
+  else if (updateStartWithCommand("/ducklist")) processDuckList()
 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
