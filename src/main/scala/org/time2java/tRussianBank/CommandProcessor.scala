@@ -82,7 +82,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 //    }
 //    sb.append("\n")
 
-    sendMessage(sb.toString())
+    if (isMainChatRoom) sendMessage("Лучше этим не пользоваться в групповом чате.")
+    else sendMessage(sb.toString())
   }
 
   def isMainChatRoom = update.getMessage.getChatId == -29036710
