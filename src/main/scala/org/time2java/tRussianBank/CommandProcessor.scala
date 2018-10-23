@@ -29,7 +29,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
-  else if (!isMainChatRoom) sendMessage(s"Обработка команды ${update.getMessage.getText} еще не реализована")
+//  else if (!isMainChatRoom) sendMessage(s"Обработка команды ${update.getMessage.getText} еще не реализована")
 
   def processAboutMyPayment(): Unit = {
     if (isMainChatRoom) sendMessage("Этот функционал работает только в личных сообщениях")
