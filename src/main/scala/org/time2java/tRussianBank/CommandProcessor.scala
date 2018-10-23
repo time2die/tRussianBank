@@ -83,6 +83,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       sb.append(iter.name).append("\n")
     }
     sb.append("\n")
+    sendMessage(sb.toString())
   }
 
 
