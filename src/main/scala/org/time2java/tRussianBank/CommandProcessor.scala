@@ -13,12 +13,9 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by time2die on 07.01.17.
   */
-
-
 object CommandProcessor {
   private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 }
-
 
 class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: List[FullAccount]) {
 
@@ -28,14 +25,11 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/debts")) processDebtsCommand()
   else if (updateStartWithCommand("/cards")) processCardsCommand()
   else if (updateStartWithCommand("/proxy")) processProxyCommand()
-
   else if (updateStartWithCommand("/ducklist")) processDuckList()
-
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
   else if (!isMainChatRoom) sendMessage(s"Обработка команды ${update.getMessage.getText} еще не реализована")
-
 
   def processAboutMyPayment(): Unit = {
     if (isMainChatRoom) sendMessage("Этот функционал работает только в личных сообщениях")
@@ -63,30 +57,31 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   def processAboutMe() {
     accounts.filter(filterByTGid) match {
       case user :: nil => sendMessage(user.toString())
-      case _ => processIdMessage()
+      case _           => processIdMessage()
     }
   }
 
-
   def processDuckList(): Unit = {
-    val hasRights:List[FullAccount] = accounts.filter(_.hasLastMonthsPays).filter(_.currentDeb.toInt < 0)
+    val sb: StringBuilder = new StringBuilder()
 
-    val sb:StringBuilder = new StringBuilder("Следующие господа не имеют долгов и оплатили последние 3 месяца")
-
-    hasRights.foreach{ iter =>
-      sb.append(iter.name).append("\n")
+    val hasRights: List[FullAccount] = accounts.filter(_.hasLastMonthsPays).filter(_.currentDeb.toInt =< 0)
+    sb.append("Следующие господа не имеют долгов и оплатили последние 3 месяца:").append("\n")
+    hasRights.foreach { iter =>
+      sb.append("-")
+        .append(iter.name)
     }
     sb.append("\n")
 
-    val timeToGoAway:List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
-    sb.append("Следующие господа не платят более 3 месяцев")
-    timeToGoAway.foreach{ iter =>
-      sb.append(iter.name).append("\n")
+    val timeToGoAway: List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
+    sb.append("Следующие господа не платят более 3 месяцев:\n")
+    timeToGoAway.foreach { iter =>
+      sb.append("-")
+        .append(iter.name)
+        .append("\n")
     }
     sb.append("\n")
     sendMessage(sb.toString())
   }
-
 
   def isMainChatRoom = update.getMessage.getChatId == -29036710
 
@@ -95,7 +90,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val admins = conf.getStringList("admins")
     admins.contains(userId + "")
   }
-
 
   def processStatusCommand() {
     val values = NGA.getStatus().values
@@ -118,9 +112,9 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     sendMessage(result.toString())
   }
 
-  def buildProxyLink():String = {
+  def buildProxyLink(): String = {
     val server = conf.getAnyRef("server").toString
-    val port= conf.getAnyRef("port").toString
+    val port = conf.getAnyRef("port").toString
     val user = conf.getAnyRef("proxyUser").toString
     val pass = conf.getAnyRef("pass").toString
     s"https://t.me/socks?server=$server&port=$port&user=$user&pass=$pass"
@@ -174,8 +168,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
       text match {
         case Failure(_: ArrayIndexOutOfBoundsException) => sendMessage("Следует указать кого вы ищите.")
-        case Success(text: String) => searchAndSend(text)
-        case _@(Failure(_) | Success(_)) => sendMessage("Свяжитесь с разработчиком.")
+        case Success(text: String)                      => searchAndSend(text)
+        case _ @(Failure(_) | Success(_))               => sendMessage("Свяжитесь с разработчиком.")
       }
     }
 
@@ -203,7 +197,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
     val result = s"fromId:$fromId from:$fName $sName\n${message.getText}"
 
-
     if (isMainChatRoom) {
       sendMessage("Информации о этом пользователи пока нет в базе, все необходмые данные были отправлены держателю. Подождите, пожалуйста, пока их обработают")
     } else {
@@ -212,7 +205,6 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
     sendTextToAdmin("aboutme: " + result)
   }
-
 
   def processDebtsCommand() {
 
@@ -227,10 +219,9 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       v7 = v7.replace(".20", ".")
 
       v6 = v6.indexOf('.') match {
-        case -1 => v6
+        case -1     => v6
         case i: Int => v6.substring(0, i)
       }
-
 
       sb.append(v0)
       sb.append(": " + v6)
@@ -240,23 +231,27 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     sendMessage(sb.toString)
   }
 
-  def getSafeDouble(in:String):Double = Try[Double]{
-    in.replace(',','.').toDouble
-  }.getOrElse(-1d)
+  def getSafeDouble(in: String): Double =
+    Try[Double] {
+      in.replace(',', '.').toDouble
+    }.getOrElse(-1d)
 
-  def buildAccountsFromDebts(ga: Answer): List[PureAccount] = ga.values.map(
-    {
-      case name :: debt :: returnDate :: tail => PureAccount(name, getSafeDouble(debt), returnDate)
-      case _ => PureAccount("", 0.0, "")
-    }
-  ).filter(filterByDebs).sortWith(filterAccount)
+  def buildAccountsFromDebts(ga: Answer): List[PureAccount] =
+    ga.values
+      .map({
+        case name :: debt :: returnDate :: tail => PureAccount(name, getSafeDouble(debt), returnDate)
+        case _                                  => PureAccount("", 0.0, "")
+      })
+      .filter(filterByDebs)
+      .sortWith(filterAccount)
 
   def filterAccount(f: PureAccount, s: PureAccount): Boolean = {
     val fDate = LocalDate.parse(f.returnDate, CommandProcessor.dateFormatter)
     val sDate = LocalDate.parse(s.returnDate, CommandProcessor.dateFormatter)
 
     if (fDate.compareTo(sDate) != 0) fDate.isBefore(sDate)
-    else if (f.currentDeb.compareTo(s.currentDeb) >= 0) false else true
+    else if (f.currentDeb.compareTo(s.currentDeb) >= 0) false
+    else true
   }
 
   def sendMessage(text: String) = {
