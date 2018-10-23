@@ -73,14 +73,15 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
     sb.append("\n")
 
-    val timeToGoAway: List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
-    sb.append("Следующие господа не платят более 3 месяцев:\n")
-    timeToGoAway.foreach { iter =>
-      sb.append("-")
-        .append(iter.name)
-        .append("\n")
-    }
-    sb.append("\n")
+//    val timeToGoAway: List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
+//    sb.append("Следующие господа не платят более 3 месяцев:\n")
+//    timeToGoAway.foreach { iter =>
+//      sb.append("-")
+//        .append(iter.name)
+//        .append("\n")
+//    }
+//    sb.append("\n")
+
     sendMessage(sb.toString())
   }
 
