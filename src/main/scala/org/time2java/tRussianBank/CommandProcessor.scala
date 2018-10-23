@@ -29,6 +29,8 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/cards")) processCardsCommand()
   else if (updateStartWithCommand("/proxy")) processProxyCommand()
 
+  else if (updateStartWithCommand("/duckList")) processDuckList()
+
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
@@ -62,6 +64,25 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
       case user :: nil => sendMessage(user.toString())
       case _ => processIdMessage()
     }
+  }
+
+
+  def processDuckList(): Unit = {
+    val hasRights:List[FullAccount] = accounts.filter(_.hasLastMonthsPays).filter(_.currentDeb.toInt < 0)
+
+    val sb:StringBuilder = new StringBuilder("Следующие господа не имеют долгов и оплатили последние 3 месяца")
+
+    hasRights.foreach{ iter =>
+      sb.append(iter.name).append("\n")
+    }
+    sb.append("\n")
+
+    val timeToGoAway:List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
+    sb.append("Следующие господа не платят более 3 месяцев")
+    timeToGoAway.foreach{ iter =>
+      sb.append(iter.name).append("\n")
+    }
+    sb.append("\n")
   }
 
 
