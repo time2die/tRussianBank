@@ -3,16 +3,13 @@ package org.time2java.tRussianBank
 /**
   * Created by time2die on 07.01.17.
   */
-
 trait Account {
   val name: String
   val currentDeb: Double
   val returnDate: String
 }
 
-case class PureAccount(name: String,
-                       currentDeb: Double,
-                       returnDate: String) extends Account
+case class PureAccount(name: String, currentDeb: Double, returnDate: String) extends Account
 
 case class FullAccount(name: String,
                        tgId: String,
@@ -26,7 +23,8 @@ case class FullAccount(name: String,
                        earlyReturn: Integer,
                        delayReturn: Integer,
                        hasLastMonthsPays: Boolean,
-                       hasCurrentMonthsPays: Boolean) extends Account {
+                       hasCurrentMonthsPays: Boolean)
+    extends Account {
 
   override def toString: String = {
     val sb: StringBuffer = new StringBuffer
@@ -34,7 +32,8 @@ case class FullAccount(name: String,
       sb.append(this.name)
       sb.append("\nВсего взносов: " + this.paymentNum)
       sb.append("\nНа сумму: " + this.paymentSum)
-      sb.append("\nx5: " + this.paymentSum.toInt*5)
+      sb.append("\nx5: " + this.paymentSum.toInt * 5)
+      sb.append("\nx0.6: " + (this.paymentSum * 0.6).toInt)
       sb.append("\nВсего займов: " + this.debtCount)
       if ("" != this.returnDate) {
         sb.append("\nСейчас должен: " + this.currentDeb)
@@ -47,8 +46,7 @@ case class FullAccount(name: String,
 
       sb.append("\nВзносы за прошедшие 3 месяца: " + getBooleanValueFromGAPI(this.hasLastMonthsPays))
       sb.append("\nВзносы за текущий месяц: " + getBooleanValueFromGAPI(this.hasCurrentMonthsPays))
-    }
-    catch {
+    } catch {
       case e: Exception =>
         e.printStackTrace()
     }
