@@ -29,7 +29,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   else if (updateStartWithCommand("/rules")) sendMessage("Правила работы кассы\n" + conf.getString("rules"))
   else if (updateStartWithCommand("/aboutme")) processAboutMe()
   else if (updateStartWithCommand("/aboutMyPayment".toLowerCase)) processAboutMyPayment()
-//  else if (!isMainChatRoom) sendMessage(s"Обработка команды ${update.getMessage.getText} еще не реализована")
+  //  else if (!isMainChatRoom) sendMessage(s"Обработка команды ${update.getMessage.getText} еще не реализована")
 
   def processAboutMyPayment(): Unit = {
     if (isMainChatRoom) sendMessage("Этот функционал работает только в личных сообщениях")
@@ -73,14 +73,14 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     }
     sb.append("\n")
 
-//    val timeToGoAway: List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
-//    sb.append("Следующие господа не платят более 3 месяцев:\n")
-//    timeToGoAway.foreach { iter =>
-//      sb.append("-")
-//        .append(iter.name)
-//        .append("\n")
-//    }
-//    sb.append("\n")
+    //    val timeToGoAway: List[FullAccount] = accounts.filterNot(_.hasLastMonthsPays)
+    //    sb.append("Следующие господа не платят более 3 месяцев:\n")
+    //    timeToGoAway.foreach { iter =>
+    //      sb.append("-")
+    //        .append(iter.name)
+    //        .append("\n")
+    //    }
+    //    sb.append("\n")
 
     if (isMainChatRoom) sendMessage("Лучше этим не пользоваться в групповом чате.")
     else sendMessage(sb.toString())
@@ -120,7 +120,22 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val port = conf.getAnyRef("port").toString
     val user = conf.getAnyRef("proxyUser").toString
     val pass = conf.getAnyRef("pass").toString
-    s"https://t.me/socks?server=$server&port=$port&user=$user&pass=$pass"
+
+    val result = new StringBuilder()
+
+    result.append(s"https://t.me/socks?server=$server&port=$port&user=$user&pass=$pass")
+    for (iter <- 1 to 3) {
+      Try {
+        val server = conf.getString("server_" + iter)
+        val port = conf.getString("port_" + iter)
+        val secret = conf.getString("secret_" + iter)
+        s"https://t.me/proxy?server=$server&port=$port&secret=$secret"
+      }.toOption.map { tgServer =>
+        result.append(tgServer)
+        result.append("\n")
+      }
+    }
+    result.toString()
   }
 
   def processProxyCommand(): Unit = {
