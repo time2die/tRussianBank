@@ -116,6 +116,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def buildProxyLink(): String = {
+
     val server = conf.getAnyRef("server").toString
     val port = conf.getAnyRef("port").toString
     val user = conf.getAnyRef("proxyUser").toString
@@ -140,7 +141,11 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
   }
 
   def processProxyCommand(): Unit = {
-    sendMessage(s"Нажмите на ссылку чтобы активировать прокси:\n${buildProxyLink()}")
+    if (isMainChatRoom) {
+      sendMessage("Лучше этим не пользоваться в групповом чате.")
+    } else {
+      sendMessage(s"Нажмите на ссылку чтобы активировать прокси:\n${buildProxyLink()}")
+    }
   }
 
   def processCardsCommand() {
