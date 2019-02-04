@@ -124,6 +124,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val result = new StringBuilder()
 
     result.append(s"https://t.me/socks?server=$server&port=$port&user=$user&pass=$pass")
+    result.append("\n")
     for (iter <- 1 to 3) {
       Try {
         val server = conf.getString("server_" + iter)
@@ -132,7 +133,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
         s"https://t.me/proxy?server=$server&port=$port&secret=$secret"
       }.toOption.map { tgServer =>
         result.append(tgServer)
-        result.append("\n")
+        result.append("\n\n")
       }
     }
     result.toString()
