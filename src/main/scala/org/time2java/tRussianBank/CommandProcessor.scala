@@ -1,7 +1,9 @@
 package org.time2java.tRussianBank
 
-import java.time.LocalDate
+import java.text.SimpleDateFormat
+import java.time.{LocalDate, LocalTime}
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 import com.typesafe.config.Config
 import org.telegram.telegrambots.api.methods.send.SendMessage
@@ -232,27 +234,49 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def processDebtsCommand() {
 
-    val searchResult: List[Account] = buildAccountsFromDebts(NGA.getDebsUser())
+    val searchResult: List[DatedAccount] = buildAccountsFromDebts(NGA.getDebsUser()).map(pureToDatedConverter)
 
-    val sb: StringBuffer = new StringBuffer("")
-    for (resultUser <- searchResult) {
-      val v0: String = resultUser.name
-      var v6: String = resultUser.currentDeb.toString
-      var v7: String = resultUser.returnDate
-      //      v7 = v7.split("\\.")(0) + "." + v7.split("\\.")(1)
-      v7 = v7.replace(".20", ".")
+    val now = new Date()
 
-      v6 = v6.indexOf('.') match {
-        case -1     => v6
-        case i: Int => v6.substring(0, i)
-      }
+    val before = searchResult.filter(_.whenReturn.before(now))
+    val after = searchResult.filter(_.whenReturn.after(now))
 
-      sb.append(v0)
-      sb.append(": " + v6)
-      sb.append("\tдо " + v7)
-      sb.append("\n")
-    }
+    val sb: StringBuilder = new StringBuilder("Просрочка:\n")
+    before.foldLeft(sb)(addStringsAboutDebs)
+    sb.append("\nДолжники:")
+    after.foldLeft(sb)(addStringsAboutDebs)
+
     sendMessage(sb.toString)
+  }
+
+  def addStringsAboutDebs(acc: StringBuilder, user: DatedAccount): StringBuilder = {
+    val v0: String = user.name
+    var v6: String = user.currentDeb.toString
+    var v7: String = user.returnDate
+    //      v7 = v7.split("\\.")(0) + "." + v7.split("\\.")(1)
+    v7 = v7.replace(".20", ".")
+
+    v6 = v6.indexOf('.') match {
+      case -1     => v6
+      case i: Int => v6.substring(0, i)
+    }
+
+    acc.append(v0)
+    acc.append(": " + v6)
+    acc.append("\tдо " + v7)
+    acc.append("\n")
+  }
+
+  val formater = new SimpleDateFormat("dd/MM/yyyy")
+
+  def pureToDatedConverter(in: List[PureAccount]): List[DatedAccount] = {
+    in.map(stoDate)
+      .filter(_.isSuccess)
+      .map(_.get)
+  }
+
+  def stoDate(in: PureAccount): Try[DatedAccount] = Try {
+    DatedAccount(in.name, in.currentDeb, in.returnDate, formater.parse(in.returnDate))
   }
 
   def getSafeDouble(in: String): Double =

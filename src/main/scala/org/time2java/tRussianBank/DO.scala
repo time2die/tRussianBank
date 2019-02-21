@@ -1,5 +1,7 @@
 package org.time2java.tRussianBank
 
+import java.util.Date
+
 /**
   * Created by time2die on 07.01.17.
   */
@@ -10,6 +12,8 @@ trait Account {
 }
 
 case class PureAccount(name: String, currentDeb: Double, returnDate: String) extends Account
+
+case class DatedAccount(name: String, currentDeb: Double, returnDate: String, whenReturn: Date) extends Account
 
 case class FullAccount(name: String,
                        tgId: String,
