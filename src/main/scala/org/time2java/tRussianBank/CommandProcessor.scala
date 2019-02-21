@@ -234,6 +234,31 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def processDebtsCommand() {
 
+    val searchResult: List[Account] = buildAccountsFromDebts(NGA.getDebsUser())
+
+    val sb: StringBuffer = new StringBuffer("")
+    for (resultUser <- searchResult) {
+      val v0: String = resultUser.name
+      var v6: String = resultUser.currentDeb.toString
+      var v7: String = resultUser.returnDate
+      //      v7 = v7.split("\\.")(0) + "." + v7.split("\\.")(1)
+      v7 = v7.replace(".20", ".")
+
+      v6 = v6.indexOf('.') match {
+        case -1     => v6
+        case i: Int => v6.substring(0, i)
+      }
+
+      sb.append(v0)
+      sb.append(": " + v6)
+      sb.append("\tдо " + v7)
+      sb.append("\n")
+    }
+    sendMessage(sb.toString)
+  }
+
+  def processDebtsCommandNEW() {
+
     val searchResult: List[DatedAccount] = pureToDatedConverter(buildAccountsFromDebts(NGA.getDebsUser()))
 
     val now = new Date()
