@@ -234,7 +234,7 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
 
   def processDebtsCommand() {
 
-    val searchResult: List[DatedAccount] = buildAccountsFromDebts(NGA.getDebsUser()).map(pureToDatedConverter)
+    val searchResult: List[DatedAccount] = pureToDatedConverter(buildAccountsFromDebts(NGA.getDebsUser()))
 
     val now = new Date()
 
