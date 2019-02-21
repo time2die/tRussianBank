@@ -241,10 +241,13 @@ class CommandProcessor(update: Update, conf: Config, bot: RussianBot, accounts: 
     val before = searchResult.filter(_.whenReturn.before(now))
     val after = searchResult.filter(_.whenReturn.after(now))
 
-    val sb: StringBuilder = new StringBuilder("Просрочка:\n")
-    before.foldLeft(sb)(addStringsAboutDebs)
-    sb.append("\nДолжники:")
-    after.foldLeft(sb)(addStringsAboutDebs)
+    val sb: StringBuilder = new StringBuilder("")
+//    val sb: StringBuilder = new StringBuilder("Просрочка:\n")
+//    before.foldLeft(sb)(addStringsAboutDebs)
+//    sb.append("\nДолжники:")
+//    after.foldLeft(sb)(addStringsAboutDebs)
+
+    searchResult.foldLeft(sb)(addStringsAboutDebs)
 
     sendMessage(sb.toString)
   }
