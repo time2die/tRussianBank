@@ -10,3 +10,6 @@ src/test/scala/
 /client_secret.json
 log/
 out/
+gradlew
+gradlew.bat
+gradle

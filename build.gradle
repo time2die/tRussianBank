@@ -49,3 +49,15 @@ startScripts {
 }
 
 applicationDefaultJvmArgs = ["-Xmx80m"]
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File',
+                'Implementation-Version': version,
+                'Main-Class': 'org.time2java.tRussianBank.Main'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}

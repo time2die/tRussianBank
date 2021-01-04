@@ -36,7 +36,7 @@ class RussianBot extends TelegramLongPollingBot {
           tgId,
           vkId,
           city,
-          paymentNum.toInt,
+          strToInt(paymentNum),
           strToD(paymentSum),
           strToInt(debtCount),
           strToD(currentDeb),
