@@ -1,0 +1,12 @@
+.git
+/build/
+/.idea/
+/.gradle/
+.gitignore
+.travis.yml
+src/test/scala/
+log/
+out/
+gradlew
+gradlew.bat
+gradle
